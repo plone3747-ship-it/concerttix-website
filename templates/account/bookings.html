@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block title %}My bookings{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="page-head spread">
+    <div><span class="kicker">Account</span><h1>My bookings</h1></div>
+    <a class="btn btn-primary" href="{{ url_for('account.tickets') }}">{{ icon('qr') }} My tickets</a>
+  </header>
+  <div class="stat-cards" style="margin-bottom:26px">
+    <div class="card stat"><small>Bookings</small><b class="num">{{ totals.orders }}</b></div>
+    <div class="card stat"><small>Tickets bought</small><b class="num">{{ totals.tickets }}</b></div>
+    <div class="card stat"><small>Total spent</small><b class="num">{{ totals.spent|money }}</b></div>
+  </div>
+  <nav class="tabs">
+    <a href="{{ url_for('account.bookings', tab='upcoming') }}" class="{{ 'active' if tab == 'upcoming' }}">Upcoming</a>
+    <a href="{{ url_for('account.bookings', tab='past') }}" class="{{ 'active' if tab == 'past' }}">Past &amp; refunded</a>
+    <a href="{{ url_for('account.bookings', tab='all') }}" class="{{ 'active' if tab == 'all' }}">All</a>
+  </nav>
+  {% if orders %}
+  <div class="stack">
+    {% for o in orders %}
+    <article class="card card-pad row" style="align-items:center;gap:18px">
+      <img src="{{ o.image|image }}" alt="" style="width:76px;height:100px;border-radius:10px;object-fit:cover">
+      <div style="flex:1;min-width:220px">
+        <div class="row" style="gap:8px"><span class="kicker">{{ o.order_ref }}</span>
+          <span class="badge badge-{{ o.payment_status }}">{{ o.payment_status|label }}</span>
+          {% if o.concert_status == 'cancelled' %}<span class="badge badge-cancelled">Event cancelled</span>{% endif %}
+          {% if o.claim_status %}<span class="badge badge-{{ o.claim_status }}">Claim {{ o.claim_status|label|lower }}</span>{% endif %}
+        </div>
+        <h3 style="margin:6px 0 2px">{{ o.title }}</h3>
+        <div class="muted small">{{ o.artist_name }} · {{ o.date|date }} · {{ o.time|time }} · {{ o.venue }}, {{ o.city }}</div>
+        <div class="small" style="margin-top:4px">Seats: <b>{{ o.seats or '—' }}</b></div>
+      </div>
+      <div style="text-align:right">
+        <b style="font-size:1.15rem">{{ o.total|money }}</b>
+        <div class="muted small">{{ o.tickets }} ticket{{ 's' if o.tickets > 1 }} · {{ o.order_date.strftime('%d %b %Y') }}</div>
+        <a class="btn btn-outline btn-sm" style="margin-top:8px" href="{{ url_for('booking.confirmation', ref=o.order_ref) }}">View {{ icon('right') }}</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card empty">{{ icon('ticket') }}<h3>No bookings here yet</h3><p>Find a show you love and grab your seats.</p><a class="btn btn-primary" href="{{ url_for('public.concerts') }}">Browse concerts</a></div>
+  {% endif %}
+</div>
+{% endblock %}

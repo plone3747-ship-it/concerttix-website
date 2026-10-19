@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import icon, price with context %}
+{% set tier_color = {'VVIP': 'var(--tier-vvip)', 'VIP': 'var(--tier-vip)', 'CAT 1': 'var(--tier-cat1)', 'General Admission': 'var(--tier-ga)'} %}
+{% block title %}Booking {{ o.order_ref }}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:960px">
+  <div class="page-head no-print">
+    <a class="link small" href="{{ url_for('account.bookings') }}">← My bookings</a>
+  </div>
+
+  {% if just_booked %}
+  <div class="card card-pad no-print" style="text-align:center;margin-bottom:24px">
+    <div class="success-ico">{{ icon('check') }}</div>
+    <h1 style="font-size:2rem">Booking confirmed!</h1>
+    <p class="muted" style="margin:0">Show the QR codes below at the entrance. You can always find them in <a class="link" href="{{ url_for('account.tickets') }}">My Tickets</a>.</p>
+  </div>
+  {% endif %}
+
+  <div class="spread" style="margin-bottom:18px">
+    <div>
+      <span class="kicker">Booking {{ o.order_ref }}</span>
+      <h2 style="margin:4px 0 0">{{ o.title }}</h2>
+      <p class="muted" style="margin:0">{{ o.artist_name }} · {{ o.date|date }} · {{ o.time|time }} · {{ o.venue }}, {{ o.city }}</p>
+    </div>
+    <div class="row no-print">
+      <span class="badge badge-{{ o.payment_status }}">{{ o.payment_status|label }}</span>
+      {% if o.concert_status == 'cancelled' %}<span class="badge badge-cancelled">Event cancelled</span>{% endif %}
+      <button class="btn btn-outline btn-sm" onclick="window.print()">{{ icon('printer') }} Print / Save PDF</button>
+    </div>
+  </div>
+
+  {% if o.payment_status == 'paid' and tickets %}
+  <div class="stack">
+    {% for t in tickets %}
+    <article class="eticket" style="--seat-color:{{ tier_color[t.type] }}">
+      <span class="tier-band"></span>
+      <div class="main">
+        <div class="spread"><span class="kicker">{{ t.type }}</span><span class="muted small">Ticket {{ loop.index }} of {{ tickets|length }}</span></div>
+        <h3 style="margin:0">{{ o.artist_name }} – {{ o.title }}</h3>
+        <span class="muted small">{{ o.date|date }} · Doors {{ o.time|time }} · {{ o.venue }}, {{ o.city }} · {{ o.age_limit }}</span>
+        <div class="info-grid" style="margin-top:6px">
+          {% if t.seat_row %}
+            <small>Row</small><small>Seat</small><small>Section</small>
+            <b>{{ t.seat_row }}</b><b>{{ t.seat_number }}</b><b>{{ t.type }}</b>
+          {% else %}
+            <small>Zone</small><small>Entry</small><small>Spot</small>
+            <b>Standing</b><b>GA</b><b>{{ t.seat_number }}</b>
+          {% endif %}
+        </div>
+        <span class="small muted">Booked by {{ o.customer_name }} · {{ o.order_ref }}</span>
+      </div>
+      <div class="stub">
+        {% if t.checked_in_at %}<span class="badge badge-success checked-stamp">{{ icon('check') }} Checked in</span>{% endif %}
+        <img class="qr" src="{{ url_for('booking.ticket_qr', token=t.qr_token) }}" alt="QR code for seat {{ t.seat }}">
+        <span class="code">{{ t.qr_token }}</span>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% elif o.payment_status == 'refunded' %}
+    <div class="note">{{ icon('refund') }}<span>This booking was refunded. Its tickets are no longer valid.</span></div>
+  {% endif %}
+
+  <div class="two-col no-print" style="margin-top:28px">
+    <div class="card card-pad">
+      <h3>Payment receipt</h3>
+      <div class="summary-row"><span class="k">Order date</span><b>{{ o.order_date.strftime('%d %b %Y, %H:%M') }}</b></div>
+      <div class="summary-row"><span class="k">Tickets</span><b>{{ o.tickets }}</b></div>
+      <div class="summary-row"><span class="k">Subtotal</span><b>{{ o.subtotal|money }}</b></div>
+      <div class="summary-row"><span class="k">Service fee (5%)</span><b>{{ o.service_fee|money }}</b></div>
+      <div class="summary-row total"><span>Total</span><span>{{ o.total|money }}</span></div>
+      {% if o.currency != 'SGD' %}<p class="small muted">Charged as {{ o.currency }} {{ '{:,.2f}'.format(o.total_in_currency) }}</p>{% endif %}
+      <p class="small muted" style="margin:0">Paid with {{ o.payment_method|label }}{% if o.card_last4 %} ending {{ o.card_last4 }}{% endif %} (demo).</p>
+    </div>
+
+    <div class="card card-pad">
+      <h3>{{ icon('shield') }} Buyer Guarantee</h3>
+      {% if claim %}
+        <p>Claim for “{{ claim.reason|label }}” submitted {{ claim.created_at|date('%d %b %Y') }}.</p>
+        <span class="badge badge-{{ claim.status }}">{{ claim.status|label }}</span>
+        {% if claim.admin_note %}<p class="small muted" style="margin-top:10px">Note from ConcertTix: {{ claim.admin_note }}</p>{% endif %}
+      {% endif %}
+      {% if o.payment_status == 'paid' and (not claim or claim.status != 'open') %}
+        <p class="small muted">Ticket invalid, not received, or event cancelled? Request a full refund.</p>
+        <details>
+          <summary class="btn btn-outline btn-sm">File a Buyer Guarantee claim</summary>
+          <form method="post" action="{{ url_for('account.claim', ref=o.order_ref) }}" style="margin-top:14px">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="field"><label for="reason">Reason</label>
+              <select id="reason" name="reason" required>
+                <option value="">Choose…</option>
+                <option value="event_cancelled" {{ 'selected' if o.concert_status == 'cancelled' }}>Event cancelled</option>
+                <option value="invalid_ticket">Ticket was invalid at the door</option>
+                <option value="not_delivered">Ticket not delivered</option>
+                <option value="other">Other</option>
+              </select></div>
+            <div class="field"><label for="details">Details</label><textarea id="details" name="details" placeholder="Tell us what happened"></textarea></div>
+            <button class="btn btn-primary btn-sm" type="submit">Submit claim</button>
+          </form>
+        </details>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

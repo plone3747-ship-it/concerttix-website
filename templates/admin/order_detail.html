@@ -1,0 +1,51 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block admin_title %}Order {{ o.order_ref }}{% endblock %}
+{% block page_title %}Order {{ o.order_ref }}{% endblock %}
+{% block admin_content %}
+<a class="link small" href="{{ url_for('admin.orders') }}">← All orders</a>
+<div class="form-grid" style="margin-top:14px">
+  <section class="card card-pad">
+    <div class="panel-head"><h3>{{ o.title }}</h3><span class="badge badge-{{ o.payment_status }}">{{ o.payment_status|label }}</span></div>
+    <p class="muted small">{{ o.date|date }} · {{ o.time|time }} · {{ o.venue }}, {{ o.city }}</p>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Seat</th><th>Type</th><th>Price</th><th>Ticket code</th><th>Check-in</th></tr></thead>
+        <tbody>
+        {% for t in tickets %}
+          <tr><td><b>{{ t.seat }}</b></td><td>{{ t.type }}</td><td class="num">{{ t.price|money }}</td>
+            <td><code class="small">{{ t.qr_token }}</code></td>
+            <td>{% if t.checked_in_at %}<span class="badge badge-success">{{ t.checked_in_at.strftime('%d %b %H:%M') }}</span>{% else %}<span class="muted small">Not yet</span>{% endif %}</td></tr>
+        {% else %}<tr><td colspan="5" class="muted">No active tickets (order refunded).</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if claims %}
+      <h3 style="margin-top:22px">Guarantee claims</h3>
+      {% for cl in claims %}<div class="note" style="margin-bottom:8px">{{ icon('shield') }}<span><b>{{ cl.reason|label }}</b> · <span class="badge badge-{{ cl.status }}">{{ cl.status|label }}</span><br>{{ cl.details }}{% if cl.admin_note %}<br><i>{{ cl.admin_note }}</i>{% endif %}</span></div>{% endfor %}
+    {% endif %}
+  </section>
+  <div class="stack">
+    <section class="card card-pad">
+      <h3>Customer</h3>
+      <b>{{ o.customer_name }}</b>
+      <div class="muted small">{{ o.customer_email }}<br>{{ o.customer_phone }}</div>
+      <a class="link small" href="{{ url_for('admin.customer_detail', uid=o.user_id) }}">View account ({{ o.account_email }})</a>
+    </section>
+    <section class="card card-pad">
+      <h3>Payment</h3>
+      <div class="summary-row"><span class="k">Date</span><b>{{ o.order_date.strftime('%d %b %Y %H:%M') }}</b></div>
+      <div class="summary-row"><span class="k">Method</span><b>{{ o.payment_method|label }}{% if o.card_last4 %} ••{{ o.card_last4 }}{% endif %}</b></div>
+      <div class="summary-row"><span class="k">Subtotal</span><b>{{ o.subtotal|money }}</b></div>
+      <div class="summary-row"><span class="k">Service fee</span><b>{{ o.service_fee|money }}</b></div>
+      <div class="summary-row total"><span>Total</span><span>{{ o.total|money }}</span></div>
+      {% if o.currency != 'SGD' %}<p class="muted small">Customer paid {{ o.currency }} {{ '{:,.2f}'.format(o.total_in_currency) }}</p>{% endif %}
+      {% if o.payment_status == 'paid' %}
+        <form method="post" action="{{ url_for('admin.order_refund', oid=o.id) }}" data-confirm="Refund {{ o.order_ref }}? Its seats will go back on sale." style="margin-top:12px">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-danger btn-block" type="submit">{{ icon('refund') }} Refund order (demo)</button></form>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

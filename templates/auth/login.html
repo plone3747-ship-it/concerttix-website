@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block title %}Log in{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-art">
+    <svg class="rings" viewBox="0 0 400 400" aria-hidden="true"><g fill="none" stroke-width="3">{% for r in range(30, 200, 24) %}<circle cx="200" cy="200" r="{{ r }}" stroke="{{ '#C3DAE8' if loop.index is odd else '#FEEFB6' }}"/>{% endfor %}</g></svg>
+    <span class="kicker" style="color:var(--blue)">Welcome back</span>
+    <div>
+      <h2>Your tickets, your seats, all in one place.</h2>
+      <p style="opacity:.8;max-width:380px">Log in to finish booking, find your QR e-tickets and keep track of every show.</p>
+    </div>
+    <span class="small" style="opacity:.6">ConcertTix · Demo project</span>
+  </div>
+  <div class="auth-form">
+    <div class="card card-pad" style="padding:32px">
+      <h1 style="font-size:1.9rem">Log in</h1>
+      <p class="muted">New here? <a class="link" href="{{ url_for('auth.signup', next=next) }}">Create an account</a></p>
+      <form method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+        <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" value="{{ email }}" required autofocus></div>
+        <div class="field"><label for="password">Password</label>
+          <div class="input-icon"><input id="password" name="password" type="password" autocomplete="current-password" required>
+          <button type="button" class="suffix" style="background:none;border:0;cursor:pointer;font:800 .72rem var(--font);color:var(--muted)" onclick="const p=document.getElementById('password');p.type=p.type==='password'?'text':'password';this.textContent=p.type==='password'?'SHOW':'HIDE'">SHOW</button></div></div>
+        <button class="btn btn-primary btn-block btn-lg" type="submit">Log in</button>
+      </form>
+      <div class="demo-creds" style="margin-top:20px">
+        <b>Demo accounts</b><br>
+        Customer: <code>user@concerttix.com</code> / <code>User@123</code><br>
+        Admin: <code>admin@concerttix.com</code> / <code>Admin@123</code>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

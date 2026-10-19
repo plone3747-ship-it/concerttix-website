@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import icon, price with context %}
+{% block title %}Select seats – {{ c.title }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-head" style="padding-bottom:0">
+    <a class="link small" href="{{ url_for('public.concert_detail', concert_id=c.id) }}">← Back to concert</a>
+    <div class="spread" style="margin-top:10px">
+      <div>
+        <span class="kicker">{{ c.artist_name }}</span>
+        <h1 style="font-size:clamp(1.6rem,3.5vw,2.4rem);margin:4px 0">{{ c.title }}</h1>
+        <p class="muted" style="margin:0">{{ c.date|date }} · {{ c.time|time }} · {{ c.venue }}, {{ c.city }}</p>
+      </div>
+      <span class="badge badge-{{ c.status }}">{{ c.status|label }}</span>
+    </div>
+  </div>
+
+  {% if not can_book %}
+    <div class="note warn" style="margin-top:20px">{{ icon('alert') }}<span>Tickets for this concert are not on sale{% if c.status == 'sold_out' %} (sold out){% elif c.status == 'cancelled' %} (cancelled){% endif %}. The map below is view only.</span></div>
+  {% endif %}
+
+  <div class="seat-page">
+    <div class="stack" style="min-width:0">
+      <!-- ================= STEP 1: ZONE MAP ================= -->
+      <section class="card zone-card" aria-labelledby="zone-title">
+        <div class="spread" style="margin-bottom:6px">
+          <h2 id="zone-title" class="zone-step"><span>1</span> Choose a zone</h2>
+          <span class="muted small">Tap a zone on the map</span>
+        </div>
+
+{% include "partials/zone_map.html" %}
+
+        <div class="zone-tabs" role="tablist" aria-label="Zones" data-zone-tabs>
+          {% for z in layout %}
+            <button type="button" class="zone-tab" role="tab" data-zone-tab="{{ z.type }}" aria-selected="false">
+              <i style="background:var(--tier-{{ {'VVIP':'vvip','VIP':'vip','CAT 1':'cat1','General Admission':'ga'}[z.type] }})"></i>
+              <span><b>{{ z.label }}</b><small data-tab-info></small></span>
+              <em class="zone-count hidden" data-tab-count></em>
+            </button>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- ================= STEP 2: SEATS IN THE ZONE ================= -->
+      <section class="card zone-card" aria-labelledby="seat-title">
+        <div class="spread">
+          <h2 id="seat-title" class="zone-step"><span>2</span> <span data-zone-heading>Pick your seats</span></h2>
+          <span class="muted small" data-zone-note></span>
+        </div>
+        <div class="zone-stage-hint">{{ icon('music') }} Stage is this way ↑</div>
+        <div class="venue-map zone-seats" id="seat-sections"></div>
+
+        <div class="ga-zone hidden" id="ga-zone">
+          <div>
+            <b><span data-ga-price></span> <span class="muted small" style="font-weight:600">per person</span></b>
+            <div class="muted small"><span data-ga-left></span> spots left · standing, first come first served</div>
+          </div>
+          <div class="stepper" role="group" aria-label="GA quantity">
+            <button type="button" data-ga-minus aria-label="Remove one">−</button>
+            <output data-ga-qty aria-live="polite">0</output>
+            <button type="button" data-ga-plus aria-label="Add one">+</button>
+          </div>
+        </div>
+
+        <div class="legend" aria-label="Legend">
+          <span><i style="background:var(--tier-vvip)"></i>VVIP</span>
+          <span><i style="background:var(--tier-vip)"></i>VIP</span>
+          <span><i style="background:var(--tier-cat1)"></i>CAT 1</span>
+          <span><i style="background:var(--tier-ga)"></i>GA</span>
+          <span><i style="background:var(--primary)"></i>Selected</span>
+          <span><i style="background:var(--seat-taken)"></i>Unavailable</span>
+        </div>
+      </section>
+    </div>
+
+    <aside class="card card-pad summary" id="summary" aria-live="polite">
+      <h3>Your selection</h3>
+      <div class="summary-row"><span class="k">Selected Seats</span><span class="seat-tags" data-sum-seats><span class="muted">None yet</span></span></div>
+      <div class="summary-row"><span class="k">Tickets</span><b class="num" data-sum-count>0</b></div>
+      <div data-sum-lines></div>
+      <div class="summary-row"><span class="k">Subtotal</span><b data-sum-subtotal data-sgd="0">S$0.00</b></div>
+      <div class="summary-row"><span class="k">Service Fee ({{ (fee_rate * 100)|round|int }}%)</span><b data-sum-fee data-sgd="0">S$0.00</b></div>
+      <div class="summary-row total"><span>Total</span><span data-sum-total data-sgd="0">S$0.00</span></div>
+      <p class="small muted" data-currency-note>Shown in <span data-currency-label></span> at indicative rates.</p>
+      <button class="btn btn-primary btn-block btn-lg" type="button" data-continue disabled style="margin-top:8px">Continue to checkout</button>
+      <button class="btn btn-ghost btn-block btn-sm" type="button" data-clear style="margin-top:6px">Clear selection</button>
+      <div class="note" style="margin-top:14px">{{ icon('info') }}<span>You can mix seats from different zones. Seats are held for 10 minutes once you continue. Up to {{ max_tickets }} tickets per order.</span></div>
+    </aside>
+  </div>
+</div>
+<div class="mobile-bar no-print">
+  <div><span class="muted small"><span data-sum-count-m>0</span> tickets</span><br><b data-sum-total-m data-sgd="0">S$0.00</b></div>
+  <button class="btn btn-primary" type="button" data-continue disabled>Continue</button>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  window.SEATMAP = {
+    concertId: {{ c.id }},
+    canBook: {{ 'true' if can_book else 'false' }},
+    maxTickets: {{ max_tickets }},
+    feeRate: {{ fee_rate }},
+    layout: {{ layout|tojson }},
+    data: {{ data|tojson }},
+    holdUrl: "{{ url_for('booking.hold', concert_id=c.id) }}",
+    seatsUrl: "{{ url_for('booking.seats_api', concert_id=c.id) }}",
+    selfUrl: "{{ url_for('booking.seats', concert_id=c.id) }}"
+  };
+</script>
+<script src="{{ url_for('static', filename='js/seatmap.js') }}"></script>
+{% endblock %}

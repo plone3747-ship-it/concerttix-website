@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block admin_title %}Guarantee claims{% endblock %}
+{% block page_title %}Buyer Guarantee claims{% endblock %}
+{% block admin_content %}
+<nav class="tabs">
+  {% for s, l in [('open','Open'), ('approved','Approved'), ('rejected','Rejected'), ('','All')] %}
+    <a href="{{ url_for('admin.claims', status=s) }}" class="{{ 'active' if status == s }}">{{ l }}</a>
+  {% endfor %}
+</nav>
+<div class="stack">
+{% for c in rows %}
+  <article class="card card-pad">
+    <div class="spread">
+      <div><span class="kicker">{{ c.reason|label }}</span><h3 style="margin:4px 0">{{ c.title }} {% if c.concert_status == 'cancelled' %}<span class="badge badge-cancelled">Event cancelled</span>{% endif %}</h3>
+        <span class="muted small">{{ c.name }} ({{ c.email }}) · <a class="link" href="{{ url_for('admin.order_detail', oid=c.order_id) }}">{{ c.order_ref }}</a> · {{ c.total|money }} · order {{ c.payment_status|label|lower }} · filed {{ c.created_at.strftime('%d %b %Y') }}</span></div>
+      <span class="badge badge-{{ c.status }}">{{ c.status|label }}</span>
+    </div>
+    {% if c.details %}<p style="margin:12px 0 0">“{{ c.details }}”</p>{% endif %}
+    {% if c.status == 'open' %}
+      <form method="post" action="{{ url_for('admin.claim_decide', claim_id=c.id) }}" class="row" style="margin-top:14px">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input class="input" name="note" placeholder="Note to customer (optional)" style="flex:1;min-width:200px">
+        <button class="btn btn-primary btn-sm" name="decision" value="approve">{{ icon('check') }} Approve &amp; refund</button>
+        <button class="btn btn-outline btn-sm" name="decision" value="reject">Reject</button>
+      </form>
+    {% elif c.admin_note %}<p class="muted small" style="margin:10px 0 0">Note: {{ c.admin_note }}</p>{% endif %}
+  </article>
+{% else %}
+  <div class="card empty">{{ icon('shield') }}<h3>No claims here</h3></div>
+{% endfor %}
+</div>
+{% endblock %}

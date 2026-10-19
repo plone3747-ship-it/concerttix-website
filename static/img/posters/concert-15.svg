@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#24191A"/><stop offset="1" stop-color="#6E4F4C"/></linearGradient>
+<clipPath id="c"><rect width="600" height="520"/></clipPath></defs>
+<rect width="600" height="800" fill="url(#g)"/>
+<g clip-path="url(#c)"><circle cx="300" cy="300" r="210" fill="#C3DAE8"/><rect x="60" y="330" width="480" height="8" fill="#24191A"/><rect x="60" y="356" width="480" height="10" fill="#24191A"/><rect x="60" y="382" width="480" height="12" fill="#24191A"/><rect x="60" y="408" width="480" height="14" fill="#24191A"/><rect x="60" y="434" width="480" height="16" fill="#24191A"/><rect x="60" y="460" width="480" height="18" fill="#24191A"/><rect x="60" y="486" width="480" height="20" fill="#24191A"/><circle cx="300" cy="300" r="210" fill="none" stroke="#FEEFB6" stroke-width="4"/></g>
+<text x="40" y="530" font-family="Manrope, 'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="4" fill="#F2D77E">THUNDER IN SINGAPORE</text>
+<text x="40" y="600" font-family="Manrope, 'Helvetica Neue', Arial, sans-serif" font-size="64" font-weight="800" letter-spacing="-1" fill="#FEEFB6">IRON LOTUS</text>
+<line x1="40" y1="726" x2="560" y2="726" stroke="#F2D77E" stroke-width="1.5" opacity="0.6"/>
+<text x="40" y="760" font-family="Manrope, 'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="700" fill="#FEEFB6">TUE 03 NOV 2026</text>
+<text x="560" y="760" text-anchor="end" font-family="Manrope, 'Helvetica Neue', Arial, sans-serif" font-size="18" fill="#F2D77E">The Star Theatre</text>
+</svg>

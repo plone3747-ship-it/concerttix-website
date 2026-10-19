@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#FEEFB6"/><stop offset="1" stop-color="#F2D77E"/></linearGradient></defs>
+<rect width="400" height="400" fill="url(#g)"/><circle cx="341" cy="93" r="40" fill="none" stroke="#8FB3CB" stroke-width="3" opacity="0.5"/><circle cx="314" cy="136" r="74" fill="none" stroke="#432F2E" stroke-width="3" opacity="0.5"/><circle cx="352" cy="53" r="108" fill="none" stroke="#8FB3CB" stroke-width="3" opacity="0.5"/><circle cx="268" cy="86" r="142" fill="none" stroke="#432F2E" stroke-width="3" opacity="0.5"/><circle cx="349" cy="99" r="176" fill="none" stroke="#8FB3CB" stroke-width="3" opacity="0.5"/><circle cx="307" cy="45" r="210" fill="none" stroke="#432F2E" stroke-width="3" opacity="0.5"/><circle cx="337" cy="125" r="244" fill="none" stroke="#8FB3CB" stroke-width="3" opacity="0.5"/><circle cx="281" cy="115" r="278" fill="none" stroke="#432F2E" stroke-width="3" opacity="0.5"/>
+<text x="40" y="340" font-family="Manrope, 'Helvetica Neue', Arial, sans-serif" font-size="150" font-weight="800" letter-spacing="-6" fill="#432F2E">MS</text>
+</svg>

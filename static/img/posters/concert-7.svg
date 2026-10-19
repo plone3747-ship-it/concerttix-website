@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#24191A"/><stop offset="1" stop-color="#6E4F4C"/></linearGradient>
+<clipPath id="c"><rect width="600" height="520"/></clipPath></defs>
+<rect width="600" height="800" fill="url(#g)"/>
+<g clip-path="url(#c)"><circle cx="382" cy="239" r="40" fill="none" stroke="#FEEFB6" stroke-width="7" opacity="0.85"/><circle cx="382" cy="239" r="78" fill="none" stroke="#C3DAE8" stroke-width="3" opacity="0.79"/><circle cx="382" cy="239" r="116" fill="none" stroke="#FEEFB6" stroke-width="3" opacity="0.73"/><circle cx="382" cy="239" r="154" fill="none" stroke="#C3DAE8" stroke-width="7" opacity="0.67"/><circle cx="382" cy="239" r="192" fill="none" stroke="#FEEFB6" stroke-width="3" opacity="0.61"/><circle cx="382" cy="239" r="230" fill="none" stroke="#C3DAE8" stroke-width="3" opacity="0.55"/><circle cx="382" cy="239" r="268" fill="none" stroke="#FEEFB6" stroke-width="7" opacity="0.49"/><circle cx="382" cy="239" r="306" fill="none" stroke="#C3DAE8" stroke-width="3" opacity="0.43"/><circle cx="382" cy="239" r="344" fill="none" stroke="#FEEFB6" stroke-width="3" opacity="0.37"/><circle cx="382" cy="239" r="382" fill="none" stroke="#C3DAE8" stroke-width="7" opacity="0.31"/><circle cx="382" cy="239" r="420" fill="none" stroke="#FEEFB6" stroke-width="3" opacity="0.25"/><circle cx="382" cy="239" r="458" fill="none" stroke="#C3DAE8" stroke-width="3" opacity="0.19"/><circle cx="382" cy="239" r="496" fill="none" stroke="#FEEFB6" stroke-width="7" opacity="0.13"/><circle cx="382" cy="239" r="26" fill="#C3DAE8"/></g>
+<text x="40" y="530" font-family="Manrope, 'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="4" fill="#F2D77E">NEON HORIZON ASIA TOUR - KUALA LUMPUR</text>
+<text x="40" y="600" font-family="Manrope, 'Helvetica Neue', Arial, sans-serif" font-size="64" font-weight="800" letter-spacing="-1" fill="#FEEFB6">KAITO REN</text>
+<line x1="40" y1="726" x2="560" y2="726" stroke="#F2D77E" stroke-width="1.5" opacity="0.6"/>
+<text x="40" y="760" font-family="Manrope, 'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="700" fill="#FEEFB6">TUE 08 DEC 2026</text>
+<text x="560" y="760" text-anchor="end" font-family="Manrope, 'Helvetica Neue', Arial, sans-serif" font-size="18" fill="#F2D77E">Axiata Arena</text>
+</svg>

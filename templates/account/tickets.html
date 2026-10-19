@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% set tier_color = {'VVIP': 'var(--tier-vvip)', 'VIP': 'var(--tier-vip)', 'CAT 1': 'var(--tier-cat1)', 'General Admission': 'var(--tier-ga)'} %}
+{% block title %}My tickets{% endblock %}
+{% block content %}
+<div class="container" style="max-width:960px">
+  <header class="page-head spread">
+    <div><span class="kicker">Account</span><h1>My tickets</h1><p class="muted" style="margin:0">Show these QR codes at the entrance. Each seat has its own code.</p></div>
+    <div class="row no-print"><a class="btn btn-outline" href="{{ url_for('account.bookings') }}">{{ icon('receipt') }} Booking history</a>
+      {% if tickets %}<button class="btn btn-outline" onclick="window.print()">{{ icon('printer') }} Print all</button>{% endif %}</div>
+  </header>
+  {% if tickets %}
+    {% for concert, group in tickets|groupby('concert_id') %}
+      {% set first = group[0] %}
+      <h2 style="font-size:1.25rem;margin:28px 0 12px">{{ first.title }} <span class="muted small" style="font-weight:600">· {{ first.date|date('%a %d %b') }}{% if first.date|days_until <= 7 %} · in {{ first.date|days_until }} day{{ 's' if first.date|days_until != 1 }}{% endif %}</span></h2>
+      <div class="stack">
+      {% for t in group %}
+        <article class="eticket" style="--seat-color:{{ tier_color[t.type] }}">
+          <span class="tier-band"></span>
+          <div class="main">
+            <span class="kicker">{{ t.type }}</span>
+            <h3 style="margin:0">{{ t.artist_name }} – {{ t.title }}</h3>
+            <span class="muted small">{{ t.date|date }} · {{ t.time|time }} · {{ t.venue }}, {{ t.city }}</span>
+            <div class="info-grid" style="margin-top:6px">
+              {% if t.seat_row %}<small>Row</small><small>Seat</small><small>Order</small><b>{{ t.seat_row }}</b><b>{{ t.seat_number }}</b><b>{{ t.order_ref }}</b>
+              {% else %}<small>Zone</small><small>Spot</small><small>Order</small><b>Standing</b><b>{{ t.seat_number }}</b><b>{{ t.order_ref }}</b>{% endif %}
+            </div>
+          </div>
+          <div class="stub">
+            {% if t.checked_in_at %}<span class="badge badge-success checked-stamp">{{ icon('check') }} Checked in</span>{% endif %}
+            <img class="qr" src="{{ url_for('booking.ticket_qr', token=t.qr_token) }}" alt="QR code for {{ t.seat }}" loading="lazy">
+            <span class="code">{{ t.qr_token }}</span>
+          </div>
+        </article>
+      {% endfor %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="card empty">{{ icon('qr') }}<h3>No upcoming tickets</h3><p>When you book, your QR e-tickets appear here instantly.</p><a class="btn btn-primary" href="{{ url_for('public.concerts') }}">Find a concert</a></div>
+  {% endif %}
+</div>
+{% endblock %}

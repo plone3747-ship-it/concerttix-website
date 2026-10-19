@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block title %}Refund policy & Buyer Guarantee{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="page-head"><span class="kicker">Policies</span><h1>Refund policy &amp; Buyer Guarantee</h1><p>Last updated {{ '2026-10-01'|date('%d %B %Y') }}. Plain-English rules for when you can get your money back.</p></header>
+  <div class="guarantee" style="max-width:760px">{{ icon('shield') }}<div><b>The ConcertTix Buyer Guarantee</b><p class="small" style="margin:4px 0 0">Every order is covered. If your ticket is invalid, never arrives, or the event is cancelled, you get a full refund including the service fee.</p></div></div>
+  <article class="prose" style="padding-bottom:40px">
+    <h2>1. Cancelled events</h2>
+    <p>If an event is cancelled and not rescheduled, you receive a <b>full refund of the ticket price and the 5% service fee</b> to your original payment method. Refunds are normally processed within 7–10 business days. You can also file a claim from the booking page in My Bookings.</p>
+    <h2>2. Postponed or rescheduled events</h2>
+    <p>Your tickets stay valid for the new date. If you can't attend, request a refund within <b>14 days</b> of the new date being announced.</p>
+    <h2>3. Invalid or undelivered tickets</h2>
+    <p>If you are refused entry because your QR ticket is invalid, or your e-ticket never appeared in My Tickets, file a Buyer Guarantee claim. We investigate within 2 business days and refund in full if the issue was not caused by you (for example, sharing your QR code with someone else).</p>
+    <h2>4. Change of mind</h2>
+    <p>Tickets are otherwise <b>non-refundable</b> once purchased, as seats are removed from sale for other fans. Please check the date, venue and age limit before you pay.</p>
+    <h2>5. How to claim</h2>
+    <ol>
+      <li>Go to <a href="{{ url_for('account.bookings') }}">My Bookings</a> and open the booking.</li>
+      <li>Click <b>File a Buyer Guarantee claim</b>, choose a reason and add details.</li>
+      <li>Our team reviews it and you'll see the decision on the booking page.</li>
+    </ol>
+    <h2>6. Fees</h2>
+    <p>ConcertTix charges one service fee: 5% of the ticket subtotal, shown before payment. It is refunded whenever the Buyer Guarantee applies.</p>
+    <div class="note warn">{{ icon('info') }}<span>ConcertTix is a demo / portfolio website. No real payments or refunds take place.</span></div>
+  </article>
+</div>
+{% endblock %}

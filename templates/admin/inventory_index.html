@@ -1,0 +1,25 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block admin_title %}Ticket inventory{% endblock %}
+{% block page_title %}Ticket inventory{% endblock %}
+{% block admin_content %}
+<p class="muted">Seat stock for every concert. Open a concert to change prices, block seats (e.g. for production or guests) or add standing capacity.</p>
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Concert</th><th>Date</th><th>Status</th><th>Available</th><th>Held</th><th>Sold</th><th>Blocked</th><th>Sell-through</th><th></th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      {% set pct = ((r.sold or 0) / (r.total or 1) * 100)|round|int %}
+      <tr>
+        <td><b>{{ r.title }}</b><div class="muted small">{{ r.artist }}</div></td>
+        <td>{{ r.date|date('%d %b %Y') }}</td>
+        <td><span class="badge badge-{{ r.status }}">{{ r.status|label }}</span></td>
+        <td class="num">{{ r.available|int }}</td><td class="num">{{ r.held|int }}</td><td class="num">{{ r.sold|int }}</td><td class="num">{{ r.blocked|int }}</td>
+        <td style="min-width:130px"><span class="num small">{{ pct }}%</span><div class="bar" style="margin-top:4px"><span style="width:{{ pct }}%"></span></div></td>
+        <td><a class="btn btn-outline btn-sm" href="{{ url_for('admin.inventory', cid=r.id) }}">Manage {{ icon('right') }}</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

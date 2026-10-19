@@ -1,0 +1,65 @@
+{# Shared concert venue map: stage, catwalk, VVIP, VIP, CAT 1 wings and GA standing.
+   Each zone is a <g class="zone" data-zone="..."> and has [data-zone-price] / [data-zone-left]
+   text slots that the page JavaScript fills in. Used by seats.html and admin/inventory.html. #}
+<svg class="zone-map" viewBox="0 0 720 540" role="group" aria-label="Venue map: stage at the top, zones below">
+  <defs>
+    <pattern id="standing" width="14" height="14" patternUnits="userSpaceOnUse">
+      <circle cx="7" cy="7" r="1.6" fill="rgba(0,0,0,.18)"/>
+    </pattern>
+    <pattern id="soldout" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="10" height="10" fill="var(--tier-sold)"/><line x1="0" y1="0" x2="0" y2="10" stroke="rgba(0,0,0,.12)" stroke-width="4"/>
+    </pattern>
+  </defs>
+
+  <!-- Stage, catwalk and B-stage -->
+  <rect class="stage-shape" x="210" y="18" width="300" height="62" rx="14"/>
+  <text class="stage-text" x="360" y="57" text-anchor="middle">STAGE</text>
+  <rect class="stage-shape" x="347" y="78" width="26" height="104"/>
+  <circle class="stage-shape" cx="360" cy="190" r="22"/>
+  <text class="stage-text small" x="360" y="194" text-anchor="middle">B</text>
+
+  <!-- CAT 1: raised seating, left and right wings -->
+  <g class="zone" data-zone="CAT 1" tabindex="0" role="button">
+    <polygon class="zone-shape" points="28,128 162,104 162,462 28,486"/>
+    <text class="zone-name" x="95" y="285" text-anchor="middle">CAT 1</text>
+    <text class="zone-sub" x="95" y="306" text-anchor="middle" data-zone-price></text>
+    <text class="zone-sub" x="95" y="324" text-anchor="middle" data-zone-left></text>
+  </g>
+  <g class="zone" data-zone="CAT 1" tabindex="-1" aria-hidden="true">
+    <polygon class="zone-shape" points="692,128 558,104 558,462 692,486"/>
+    <text class="zone-name" x="625" y="285" text-anchor="middle">CAT 1</text>
+    <text class="zone-sub" x="625" y="306" text-anchor="middle" data-zone-price></text>
+    <text class="zone-sub" x="625" y="324" text-anchor="middle" data-zone-left></text>
+  </g>
+
+  <!-- VVIP: either side of the catwalk -->
+  <g class="zone" data-zone="VVIP" tabindex="0" role="button">
+    <rect class="zone-shape" x="186" y="100" width="146" height="78" rx="12"/>
+    <text class="zone-name" x="259" y="134" text-anchor="middle">VVIP</text>
+    <text class="zone-sub" x="259" y="154" text-anchor="middle" data-zone-price></text>
+  </g>
+  <g class="zone" data-zone="VVIP" tabindex="-1" aria-hidden="true">
+    <rect class="zone-shape" x="388" y="100" width="146" height="78" rx="12"/>
+    <text class="zone-name" x="461" y="134" text-anchor="middle">VVIP</text>
+    <text class="zone-sub" x="461" y="154" text-anchor="middle" data-zone-left></text>
+  </g>
+
+  <!-- VIP: floor seats -->
+  <g class="zone" data-zone="VIP" tabindex="0" role="button">
+    <rect class="zone-shape" x="186" y="226" width="348" height="98" rx="12"/>
+    <text class="zone-name" x="360" y="266" text-anchor="middle">VIP</text>
+    <text class="zone-sub" x="360" y="287" text-anchor="middle"><tspan data-zone-price></tspan> · <tspan data-zone-left></tspan></text>
+  </g>
+
+  <!-- GA: standing area with sound desk -->
+  <g class="zone" data-zone="General Admission" tabindex="0" role="button">
+    <rect class="zone-shape" x="186" y="342" width="348" height="120" rx="12"/>
+    <rect x="186" y="342" width="348" height="120" rx="12" fill="url(#standing)" pointer-events="none"/>
+    <text class="zone-name" x="360" y="380" text-anchor="middle">GA · STANDING</text>
+    <text class="zone-sub" x="360" y="401" text-anchor="middle"><tspan data-zone-price></tspan> · <tspan data-zone-left></tspan></text>
+    <rect class="foh" x="326" y="420" width="68" height="26" rx="5"/>
+    <text class="foh-text" x="360" y="437" text-anchor="middle">SOUND</text>
+  </g>
+
+  <text class="entrance" x="360" y="516" text-anchor="middle">▲ ENTRANCE ▲</text>
+</svg>

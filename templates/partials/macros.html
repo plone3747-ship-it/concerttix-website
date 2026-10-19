@@ -1,0 +1,108 @@
+{# ---------- Inline SVG icons (stroke style, 24x24) ---------- #}
+{% set ICONS = {
+  'search': '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  'calendar': '<rect x="3" y="4.5" width="18" height="17" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
+  'clock': '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  'pin': '<path d="M12 21s-7-6.2-7-11.5a7 7 0 1 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  'ticket': '<path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2.5"/>',
+  'heart': '<path d="M12 20.5s-8-4.9-8-11A4.5 4.5 0 0 1 12 6.6 4.5 4.5 0 0 1 20 9.5c0 6.1-8 11-8 11z"/>',
+  'star': '<path fill="currentColor" stroke="none" d="m12 2.8 2.8 5.8 6.3.9-4.6 4.5 1.1 6.3L12 17.3l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z"/>',
+  'user': '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  'users': '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.5-5.5 6.5-5.5s5.5 2 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.6c1.8.8 3 2.6 3.5 5.4"/>',
+  'moon': '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  'sun': '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  'menu': '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  'music': '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  'shield': '<path d="M12 3 4.5 6v5.5c0 4.7 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.8 7.5-9.5V6z"/><path d="m8.8 12 2.2 2.2 4.4-4.4"/>',
+  'qr': '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14v.01M20 20h-3M14 20v.01M17 17h3v3"/>',
+  'globe': '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>',
+  'card': '<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6 15h4"/>',
+  'chat': '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/>',
+  'check': '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  'x': '<path d="M6 6l12 12M18 6 6 18"/>',
+  'info': '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.01"/>',
+  'alert': '<path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4M12 17v.01"/>',
+  'right': '<path d="m9 6 6 6-6 6"/>',
+  'left': '<path d="m15 6-6 6 6 6"/>',
+  'arrow': '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  'logout': '<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/>',
+  'chart': '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  'building': '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 7h.01M15 7h.01M9 11h.01M15 11h.01M9 15h.01M15 15h.01M10 21v-3h4v3"/>',
+  'mic': '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  'receipt': '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+  'inbox': '<path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M5.5 5h13L21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6z"/>',
+  'scan': '<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/>',
+  'layers': '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+  'plus': '<path d="M12 5v14M5 12h14"/>',
+  'edit': '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+  'trash': '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  'download': '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+  'home': '<path d="m3 11 9-7 9 7"/><path d="M5 9.5V20h14V9.5"/>',
+  'sparkle': '<path d="M12 3c.6 4.3 2.7 6.4 7 7-4.3.6-6.4 2.7-7 7-.6-4.3-2.7-6.4-7-7 4.3-.6 6.4-2.7 7-7zM19 16c.3 1.6 1 2.3 2.5 2.5-1.6.3-2.3 1-2.5 2.5-.3-1.6-1-2.3-2.5-2.5 1.6-.3 2.3-1 2.5-2.5z"/>',
+  'refund': '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7.5v9M14.5 9.5h-3.3a1.7 1.7 0 0 0 0 3.4h1.6a1.7 1.7 0 0 1 0 3.4H9.5"/>',
+  'mail': '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 6.5 8.5 6 8.5-6"/>',
+  'phone': '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+  'printer': '<path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="7" y="14" width="10" height="7" rx="1"/>',
+  'age': '<circle cx="12" cy="12" r="9"/><path d="M8 9.5h1.5V15M13 9.5h3l-2 5.5"/>',
+  'eye': '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+} %}
+{% macro icon(name, cls='icon') -%}
+<svg class="{{ cls }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ ICONS.get(name, '')|safe }}</svg>
+{%- endmacro %}
+
+{% macro logo_mark() -%}
+<svg class="logo-mark" viewBox="0 0 48 48" aria-hidden="true"><defs><mask id="lm"><rect width="48" height="48" fill="#fff"/><circle cx="3" cy="24" r="5.5" fill="#000"/><circle cx="45" cy="24" r="5.5" fill="#000"/></mask></defs><rect class="t" x="3" y="8" width="42" height="32" rx="8" mask="url(#lm)"/><rect class="b1" x="14" y="18" width="4.5" height="12" rx="2.25"/><rect class="b2" x="21.75" y="13" width="4.5" height="22" rx="2.25"/><rect class="b1" x="29.5" y="20" width="4.5" height="8" rx="2.25"/></svg>
+{%- endmacro %}
+
+{% macro price(sgd) -%}
+<span class="price num" data-sgd="{{ '%.2f'|format(sgd|float) }}">S${{ '{:,.2f}'.format(sgd|float) }}</span>
+{%- endmacro %}
+
+{% macro stars(n) -%}
+<span class="stars" aria-label="{{ n }} out of 5 stars">{% for i in range(5) %}<svg viewBox="0 0 24 24" style="{{ '' if i < n else 'opacity:.25' }}"><path fill="currentColor" d="m12 2.8 2.8 5.8 6.3.9-4.6 4.5 1.1 6.3L12 17.3l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z"/></svg>{% endfor %}</span>
+{%- endmacro %}
+
+{% macro concert_card(c, favs) -%}
+<article class="card concert-card">
+  <div class="thumb">
+    <img src="{{ c.image|image }}" alt="{{ c.title }} poster" loading="lazy">
+    <div class="date-badge"><span>{{ c.date.strftime('%b') }}</span><b>{{ c.date.strftime('%d') }}</b><span>{{ c.date.strftime('%a') }}</span></div>
+    {% if c.status in ('sold_out', 'cancelled', 'completed') %}
+      <span class="badge badge-{{ c.status }} status-flag">{{ c.status|label }}</span>
+    {% elif c.available is defined and c.available and c.capacity and c.available / c.capacity < 0.2 %}
+      <span class="badge badge-cream status-flag">Selling fast</span>
+    {% endif %}
+  </div>
+  <button class="fav-btn {{ 'on' if c.id in favs }}" data-fav="{{ c.id }}" aria-label="Save {{ c.title }} to favourites" aria-pressed="{{ 'true' if c.id in favs else 'false' }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20.5s-8-4.9-8-11A4.5 4.5 0 0 1 12 6.6 4.5 4.5 0 0 1 20 9.5c0 6.1-8 11-8 11z"/></svg>
+  </button>
+  <div class="body">
+    <span class="artist">{{ c.artist_name }} · {{ c.genre }}</span>
+    <h3><a href="{{ url_for('public.concert_detail', concert_id=c.id) }}">{{ c.title }}</a></h3>
+    <span class="meta">{{ icon('pin', 'icon') }} {{ c.venue }}, {{ c.city }}</span>
+    <span class="meta">{{ icon('clock', 'icon') }} {{ c.date|date('%a %d %b %Y') }} · {{ c.time|time }}</span>
+    <div class="foot">
+      {% if c.min_price is not none and c.status == 'on_sale' %}
+        <span class="from">from <b>{{ price(c.min_price) }}</b></span>
+      {% else %}
+        <span class="from">{{ c.status|label }}</span>
+      {% endif %}
+      {% if c.rating %}<span class="rating">{{ icon('star') }} {{ c.rating }}</span>{% endif %}
+    </div>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro pagination(page, pages, endpoint, params) -%}
+{% if pages > 1 %}
+<nav class="pagination" aria-label="Pages">
+  {% if page > 1 %}<a href="{{ url_for(endpoint, page=page-1, **params) }}" aria-label="Previous">‹</a>{% endif %}
+  {% for p in range(1, pages + 1) %}
+    {% if p == page %}<span class="current">{{ p }}</span>
+    {% elif p == 1 or p == pages or (p - page)|abs <= 2 %}<a href="{{ url_for(endpoint, page=p, **params) }}">{{ p }}</a>
+    {% elif (p - page)|abs == 3 %}<span>…</span>{% endif %}
+  {% endfor %}
+  {% if page < pages %}<a href="{{ url_for(endpoint, page=page+1, **params) }}" aria-label="Next">›</a>{% endif %}
+</nav>
+{% endif %}
+{%- endmacro %}

@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block admin_title %}Venues{% endblock %}
+{% block page_title %}Venues{% endblock %}
+{% block top_actions %}<a class="btn btn-primary btn-sm" href="{{ url_for('admin.venue_form') }}">{{ icon('plus') }} Add venue</a>{% endblock %}
+{% block admin_content %}
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Venue</th><th class="wrap">Address</th><th>City</th><th>Capacity</th><th>Concerts</th><th></th></tr></thead>
+    <tbody>
+    {% for v in rows %}
+      <tr>
+        <td><b>{{ v.name }}</b></td>
+        <td class="wrap muted small">{{ v.address }}</td>
+        <td>{{ v.city }}</td>
+        <td class="num">{{ '{:,}'.format(v.capacity) }}</td>
+        <td class="num">{{ v.shows }}</td>
+        <td><div class="actions">
+          <a class="icon-btn" href="{{ url_for('admin.venue_form', vid=v.id) }}" title="Edit">{{ icon('edit') }}</a>
+          <form method="post" action="{{ url_for('admin.venue_delete', vid=v.id) }}" data-confirm="Delete {{ v.name }}?"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="icon-btn" type="submit" title="Delete">{{ icon('trash') }}</button></form>
+        </div></td>
+      </tr>
+    {% else %}<tr><td colspan="6" class="muted" style="text-align:center;padding:40px">No venues yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

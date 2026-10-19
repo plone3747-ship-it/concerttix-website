@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block admin_title %}Door check-in{% endblock %}
+{% block page_title %}Door check-in{% endblock %}
+{% block admin_content %}
+<form class="filter-bar" method="get">
+  <label class="label" for="concert">Concert</label>
+  <select id="concert" class="input" name="concert" onchange="this.form.submit()">
+    {% for c in concerts %}<option value="{{ c.id }}" {{ 'selected' if c.id == cid }}>{{ c.date|date('%d %b') }} · {{ c.title }}</option>{% endfor %}
+  </select>
+</form>
+<div class="form-grid">
+  <section class="card card-pad">
+    <h3>Scan or enter a ticket</h3>
+    <form data-checkin-form class="row" style="flex-wrap:nowrap">
+      <label for="code" class="sr-only">Ticket code</label>
+      <input id="code" class="input" placeholder="CTX-XXXXXXXXXXXXXXXX" autocomplete="off" autofocus style="text-transform:uppercase">
+      <button class="btn btn-primary" type="submit">Check in</button>
+    </form>
+    <div class="row" style="margin-top:12px">
+      <button class="btn btn-outline btn-sm" type="button" data-camera>{{ icon('scan') }} Scan with camera</button>
+      <span class="muted small">Works on phones and laptops with a camera (HTTPS or localhost).</span>
+    </div>
+    <div id="qr-reader" style="margin-top:12px"></div>
+    <div class="scan-result hidden" data-result style="margin-top:18px"><b class="big" data-result-title></b><span data-result-text></span><div class="small" data-result-ticket style="margin-top:6px"></div></div>
+  </section>
+  <div class="stack">
+    {% if stats %}
+    <section class="card card-pad">
+      <h3>Attendance</h3>
+      {% set pct = ((stats.checked or 0) / (stats.sold or 1) * 100)|round|int %}
+      <b style="font-size:2rem" data-checked>{{ stats.checked|int }}</b> <span class="muted">/ {{ stats.sold }} tickets checked in</span>
+      <div class="bar" style="margin-top:8px"><span style="width:{{ pct }}%"></span></div>
+    </section>
+    {% endif %}
+    <section class="card card-pad">
+      <h3>Recent check-ins</h3>
+      {% for r in recent %}<div class="summary-row small"><span><b>{{ r.seat }}</b> · {{ r.customer_name }}</span><span class="muted">{{ r.checked_in_at.strftime('%H:%M') }}</span></div>
+      {% else %}<p class="muted small">No check-ins yet for this concert.</p>{% endfor %}
+    </section>
+  </div>
+</div>
+{% endblock %}
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='vendor/html5-qrcode.min.js') }}"></script>
+<script>window.CHECKIN = { url: "{{ url_for('admin.checkin_api') }}", concertId: {{ cid or 'null' }} };</script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

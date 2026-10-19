@@ -1,0 +1,16 @@
+{% extends "admin/base.html" %}
+{% block admin_title %}{{ 'Edit venue' if v.id else 'Add venue' }}{% endblock %}
+{% block page_title %}{{ 'Edit venue' if v.id else 'Add venue' }}{% endblock %}
+{% block admin_content %}
+<a class="link small" href="{{ url_for('admin.venues') }}">← All venues</a>
+<form method="post" class="card card-pad" style="max-width:640px;margin-top:14px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="field"><label for="name">Venue name</label><input id="name" name="name" value="{{ v.name or '' }}" required></div>
+  <div class="field"><label for="address">Address</label><input id="address" name="address" value="{{ v.address or '' }}" required></div>
+  <div class="field-row">
+    <div class="field"><label for="city">City</label><input id="city" name="city" value="{{ v.city or 'Singapore' }}" required></div>
+    <div class="field"><label for="capacity">Capacity</label><input id="capacity" name="capacity" type="number" min="1" value="{{ v.capacity or '' }}" required></div>
+  </div>
+  <div class="row"><button class="btn btn-primary" type="submit">Save venue</button><a class="btn btn-ghost" href="{{ url_for('admin.venues') }}">Cancel</a></div>
+</form>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon, pagination with context %}
+{% block admin_title %}Orders{% endblock %}
+{% block page_title %}Orders{% endblock %}
+{% block top_actions %}<a class="btn btn-outline btn-sm" href="{{ url_for('admin.orders_csv', q=q, status=status, concert=concert) }}">{{ icon('download') }} Export CSV</a>{% endblock %}
+{% block admin_content %}
+<form class="filter-bar" method="get">
+  <input class="input" type="search" name="q" value="{{ q }}" placeholder="Order ref, name or email" aria-label="Search">
+  <select class="input" name="status" aria-label="Payment status" onchange="this.form.submit()">
+    <option value="">All statuses</option>
+    {% for s in ['paid','refunded','pending','failed','cancelled'] %}<option value="{{ s }}" {{ 'selected' if s == status }}>{{ s|label }}</option>{% endfor %}
+  </select>
+  <select class="input" name="concert" aria-label="Concert" onchange="this.form.submit()">
+    <option value="">All concerts</option>
+    {% for c in concerts %}<option value="{{ c.id }}" {{ 'selected' if (c.id|string) == concert }}>{{ c.title }} ({{ c.date|date('%d %b') }})</option>{% endfor %}
+  </select>
+  <button class="btn btn-outline btn-sm" type="submit">Filter</button>
+</form>
+<div class="stat-cards" style="margin-bottom:16px">
+  <div class="card stat"><small>Orders</small><b class="num">{{ '{:,}'.format(total) }}</b></div>
+  <div class="card stat"><small>Paid tickets</small><b class="num">{{ '{:,}'.format(sums.tickets|int) }}</b></div>
+  <div class="card stat"><small>Paid revenue</small><b class="num">{{ sums.revenue|money }}</b></div>
+</div>
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Concert</th><th>Tickets</th><th>Total</th><th>Method</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for o in rows %}
+      <tr>
+        <td><a class="link" href="{{ url_for('admin.order_detail', oid=o.id) }}"><b>{{ o.order_ref }}</b></a></td>
+        <td>{{ o.order_date.strftime('%d %b %Y') }}<div class="muted small">{{ o.order_date.strftime('%H:%M') }}</div></td>
+        <td>{{ o.customer_name }}<div class="muted small">{{ o.customer_email }}</div></td>
+        <td>{{ o.title }}</td>
+        <td class="num">{{ o.tickets }}</td>
+        <td class="num">{{ o.total|money }}{% if o.currency != 'SGD' %}<div class="muted small">{{ o.currency }}</div>{% endif %}</td>
+        <td>{{ o.payment_method|label }}</td>
+        <td><span class="badge badge-{{ o.payment_status }}">{{ o.payment_status|label }}</span></td>
+      </tr>
+    {% else %}<tr><td colspan="8" class="muted" style="text-align:center;padding:40px">No orders match.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pagination(page, pages, 'admin.orders', {'q': q, 'status': status, 'concert': concert}) }}
+{% endblock %}

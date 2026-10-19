@@ -1,0 +1,170 @@
+{% from "partials/macros.html" import icon, logo_mark, price with context %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ConcertTix{% endblock %} · ConcertTix</title>
+  <meta name="description" content="{% block description %}Book concert tickets in Singapore and across Asia with interactive seat maps, up-front fees and instant QR e-tickets.{% endblock %}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    /* Apply the saved theme before the page paints (no flash) */
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('ctx-theme'); } catch (e) {}
+      if (!t) t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+    window.CTX = { currencies: {{ currencies_json|safe }}, loggedIn: {{ 'true' if current_user else 'false' }},
+                   loginUrl: "{{ url_for('auth.login') }}", serverCurrency: "{{ session.get('currency', '') }}" };
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+{% block header %}
+<header class="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="Main">
+      <a href="{{ url_for('public.home') }}" class="logo" aria-label="ConcertTix home">
+        {{ logo_mark() }}<span class="logo-word">concert<span class="tix">tix</span></span>
+      </a>
+      <div class="nav-links">
+        {% set ep = request.endpoint or '' %}
+        <a href="{{ url_for('public.concerts') }}" class="{{ 'active' if ep.startswith('public.concert') or ep.startswith('booking.') }}">Concerts</a>
+        <a href="{{ url_for('public.concerts', when='weekend') }}">This weekend</a>
+        <a href="{{ url_for('public.about') }}" class="{{ 'active' if ep == 'public.about' }}">About</a>
+        <a href="{{ url_for('public.faq') }}" class="{{ 'active' if ep == 'public.faq' }}">FAQ</a>
+        <a href="{{ url_for('public.contact') }}" class="{{ 'active' if ep == 'public.contact' }}">Contact</a>
+      </div>
+      <div class="nav-right">
+        <label class="sr-only" for="currency">Currency</label>
+        <select id="currency" class="currency-select hide-mobile" data-currency-select>
+          {% for code in currency_codes %}<option value="{{ code }}">{{ code }}</option>{% endfor %}
+        </select>
+        <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Switch dark / light mode" title="Dark / light mode">
+          {{ icon('moon', 'icon moon') }}{{ icon('sun', 'icon sun') }}
+        </button>
+        {% if current_user %}
+          <div class="menu" data-menu>
+            <button class="menu-btn" type="button" aria-haspopup="true" aria-expanded="false">
+              <span class="avatar">{{ current_user.name[:1]|upper }}</span><span class="hide-mobile">{{ current_user.name.split()[0] }}</span>
+            </button>
+            <div class="menu-list" role="menu">
+              {% if current_user.role == 'admin' %}<a href="{{ url_for('admin.dashboard') }}">{{ icon('chart') }} Admin dashboard</a><hr>{% endif %}
+              <a href="{{ url_for('account.tickets') }}">{{ icon('qr') }} My tickets</a>
+              <a href="{{ url_for('account.bookings') }}">{{ icon('receipt') }} My bookings</a>
+              <a href="{{ url_for('account.favorites') }}">{{ icon('heart') }} Favourites</a>
+              <a href="{{ url_for('account.profile') }}">{{ icon('user') }} Profile</a>
+              <hr>
+              <form method="post" action="{{ url_for('auth.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">{{ icon('logout') }} Log out</button></form>
+            </div>
+          </div>
+        {% else %}
+          <a href="{{ url_for('auth.login', next=request.full_path if request.endpoint not in ('auth.login','auth.signup') else None) }}" class="btn btn-ghost btn-sm hide-mobile">Log in</a>
+          <a href="{{ url_for('auth.signup') }}" class="btn btn-primary btn-sm">Sign up</a>
+        {% endif %}
+        <button class="icon-btn burger" type="button" data-burger aria-label="Open menu" aria-expanded="false">{{ icon('menu') }}</button>
+      </div>
+    </nav>
+    <div class="mobile-nav" data-mobile-nav>
+      <a href="{{ url_for('public.concerts') }}">Concerts</a>
+      <a href="{{ url_for('public.concerts', when='weekend') }}">This weekend</a>
+      <a href="{{ url_for('public.about') }}">About</a>
+      <a href="{{ url_for('public.faq') }}">FAQ</a>
+      <a href="{{ url_for('public.refund') }}">Refund policy</a>
+      <a href="{{ url_for('public.contact') }}">Contact</a>
+      {% if not current_user %}<a href="{{ url_for('auth.login') }}">Log in</a>{% endif %}
+      <div class="row">
+        <label for="currency-m" class="label">Currency</label>
+        <select id="currency-m" class="currency-select" data-currency-select>
+          {% for code in currency_codes %}<option value="{{ code }}">{{ code }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+</header>
+{% endblock %}
+
+<div class="flashes" aria-live="polite" data-flashes>
+  {% for cat, msg in get_flashed_messages(with_categories=true) %}
+    <div class="flash flash-{{ cat }}" role="status"><span>{{ msg }}</span><button type="button" aria-label="Dismiss">×</button></div>
+  {% endfor %}
+</div>
+
+<main id="main">{% block content %}{% endblock %}</main>
+
+{% block footer %}
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="{{ url_for('public.home') }}" class="logo">{{ logo_mark() }}<span class="logo-word">concert<span class="tix">tix</span></span></a>
+        <p class="muted small" style="margin-top:12px;max-width:320px">Transparent concert ticketing: interactive seat maps, fees shown up front, instant QR e-tickets and a Buyer Guarantee on every order.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="{{ url_for('public.concerts') }}">All concerts</a></li>
+          <li><a href="{{ url_for('public.concerts', city='Singapore') }}">Singapore</a></li>
+          <li><a href="{{ url_for('public.concerts', when='month') }}">Next 30 days</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Help</h4>
+        <ul>
+          <li><a href="{{ url_for('public.faq') }}">FAQ</a></li>
+          <li><a href="{{ url_for('public.refund') }}">Refund policy</a></li>
+          <li><a href="{{ url_for('public.contact') }}">Contact us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Account</h4>
+        <ul>
+          <li><a href="{{ url_for('account.tickets') }}">My tickets</a></li>
+          <li><a href="{{ url_for('account.bookings') }}">My bookings</a></li>
+          <li><a href="{{ url_for('public.about') }}">About ConcertTix</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="demo-ribbon">
+      <span>© {{ 2026 }} ConcertTix · Final Year Project by Aung Phone Khant</span>
+      <span>Demo / portfolio site. No real payments are processed.</span>
+    </div>
+  </div>
+</footer>
+{% endblock %}
+
+{% block chat %}
+<button class="chat-fab" type="button" data-chat-open aria-controls="chat-panel" aria-expanded="false">{{ icon('chat') }}<span class="lbl">Ask Tixie</span></button>
+<section class="chat-panel" id="chat-panel" aria-label="ConcertTix assistant">
+  <div class="chat-head">
+    <span class="bot">{{ icon('sparkle') }}</span>
+    <div><b>Tixie</b><small>ConcertTix booking assistant</small></div>
+    <button type="button" data-chat-close aria-label="Close chat">×</button>
+  </div>
+  <div class="chat-body" data-chat-body>
+    <div class="msg bot">Hi{{ ' ' + current_user.name.split()[0] if current_user }}! I'm Tixie. Ask me about upcoming concerts, seats, fees, e-tickets or refunds.</div>
+  </div>
+  <div class="chat-suggest" data-chat-suggest>
+    <button type="button">What's on this weekend?</button>
+    <button type="button">K-Pop concerts</button>
+    <button type="button">How much is the service fee?</button>
+    <button type="button">How do refunds work?</button>
+  </div>
+  <form class="chat-form" data-chat-form>
+    <label for="chat-input" class="sr-only">Message</label>
+    <input id="chat-input" autocomplete="off" placeholder="Ask anything about tickets…" maxlength="500">
+    <button class="btn btn-primary btn-sm" type="submit">Send</button>
+  </form>
+</section>
+{% endblock %}
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

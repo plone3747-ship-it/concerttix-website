@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block admin_title %}Artists{% endblock %}
+{% block page_title %}Artists{% endblock %}
+{% block top_actions %}<a class="btn btn-primary btn-sm" href="{{ url_for('admin.artist_form') }}">{{ icon('plus') }} Add artist</a>{% endblock %}
+{% block admin_content %}
+<form class="filter-bar" method="get">
+  <input class="input" type="search" name="q" value="{{ q }}" placeholder="Search name or genre" aria-label="Search">
+  <button class="btn btn-outline btn-sm" type="submit">Search</button>
+  <span class="muted small" style="margin-left:auto">{{ rows|length }} artists</span>
+</form>
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th></th><th>Artist</th><th>Genre</th><th>Concerts</th><th class="wrap">Description</th><th></th></tr></thead>
+    <tbody>
+    {% for a in rows %}
+      <tr>
+        <td><img src="{{ a.image|image }}" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover"></td>
+        <td><b>{{ a.name }}</b></td>
+        <td><span class="badge badge-blue">{{ a.genre }}</span></td>
+        <td class="num">{{ a.shows }}</td>
+        <td class="wrap muted small">{{ (a.description or '')[:110] }}{{ '…' if a.description and a.description|length > 110 }}</td>
+        <td><div class="actions">
+          <a class="icon-btn" href="{{ url_for('public.artist', artist_id=a.id) }}" target="_blank" title="View">{{ icon('eye') }}</a>
+          <a class="icon-btn" href="{{ url_for('admin.artist_form', aid=a.id) }}" title="Edit">{{ icon('edit') }}</a>
+          <form method="post" action="{{ url_for('admin.artist_delete', aid=a.id) }}" data-confirm="Delete {{ a.name }}?"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="icon-btn" type="submit" title="Delete">{{ icon('trash') }}</button></form>
+        </div></td>
+      </tr>
+    {% else %}<tr><td colspan="6" class="muted" style="text-align:center;padding:40px">No artists found.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="container" style="max-width:900px">
+  <header class="page-head"><span class="kicker">Account</span><h1>Profile</h1><p>Member since {{ current_user.created_at.strftime('%B %Y') }}.</p></header>
+  <div class="grid grid-2" style="padding-bottom:40px">
+    <form class="card card-pad" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="details">
+      <h3>Your details</h3>
+      <div class="field"><label for="name">Full name</label><input id="name" name="name" value="{{ current_user.name }}" required></div>
+      <div class="field"><label for="email">Email</label><input id="email" value="{{ current_user.email }}" disabled></div>
+      <div class="field"><label for="phone">Phone</label><input id="phone" name="phone" type="tel" value="{{ current_user.phone or '' }}" required></div>
+      <button class="btn btn-primary" type="submit">Save changes</button>
+    </form>
+    <form class="card card-pad" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="password">
+      <h3>Change password</h3>
+      <div class="field"><label for="cp">Current password</label><input id="cp" name="current_password" type="password" autocomplete="current-password" required></div>
+      <div class="field"><label for="np">New password</label><input id="np" name="new_password" type="password" autocomplete="new-password" required></div>
+      <div class="field"><label for="cf">Confirm new password</label><input id="cf" name="confirm_password" type="password" autocomplete="new-password" required></div>
+      <button class="btn btn-primary" type="submit">Update password</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

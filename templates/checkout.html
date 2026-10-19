@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import icon, price with context %}
+{% set tier_color = {'VVIP': 'var(--tier-vvip)', 'VIP': 'var(--tier-vip)', 'CAT 1': 'var(--tier-cat1)', 'General Admission': 'var(--tier-ga)'} %}
+{% block title %}Checkout – {{ c.title }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-head spread" style="padding-bottom:0">
+    <div><span class="kicker">Secure checkout</span><h1 style="font-size:clamp(1.6rem,3.5vw,2.3rem);margin:4px 0 0">Complete your booking</h1></div>
+    <span class="timer" data-timer role="timer" aria-live="off">{{ icon('clock') }} Seats held for <span data-timer-text>10:00</span></span>
+  </div>
+
+  <ol class="steps" aria-label="Checkout steps">
+    <li class="step done" data-step-ind="1">Select Tickets</li>
+    <li class="step active" data-step-ind="2">Customer Information</li>
+    <li class="step" data-step-ind="3">Payment</li>
+    <li class="step" data-step-ind="4">Confirmation</li>
+  </ol>
+
+  <div class="checkout-grid">
+    <div>
+      <!-- STEP 1: tickets -->
+      <section class="card card-pad pane" data-pane="1">
+        <div class="spread"><h2 style="font-size:1.35rem;margin:0">1. Your tickets</h2>
+          <a class="btn btn-outline btn-sm" href="{{ url_for('booking.seats', concert_id=c.id) }}">Change seats</a></div>
+        <div style="margin-top:10px">
+          {% for t in tickets %}
+          <div class="ticket-line">
+            <span class="seat-pill" style="--seat-color:{{ tier_color[t.type] }}">{{ t.seat }}</span>
+            <div style="flex:1"><b>{{ t.type }}</b><div class="muted small">{% if t.seat_row %}Row {{ t.seat_row }}, Seat {{ t.seat_number }}{% else %}Standing · spot {{ t.seat_number }}{% endif %}</div></div>
+            <b>{{ price(t.price) }}</b>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn btn-primary" type="button" data-go="2">Continue {{ icon('arrow') }}</button></div>
+      </section>
+
+      <!-- STEP 2: customer -->
+      <section class="card card-pad pane active" data-pane="2">
+        <h2 style="font-size:1.35rem">2. Customer information</h2>
+        <p class="muted small">E-tickets and the receipt are sent to this email.</p>
+        <form data-customer-form novalidate>
+          <div class="field"><label for="c-name">Full Name</label><input id="c-name" name="name" autocomplete="name" value="{{ current_user.name }}" required><span class="err" data-err="name"></span></div>
+          <div class="field-row">
+            <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" value="{{ current_user.email }}" required><span class="err" data-err="email"></span></div>
+            <div class="field"><label for="c-phone">Phone Number</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" value="{{ current_user.phone or '' }}" placeholder="+65 8123 4567" required><span class="err" data-err="phone"></span></div>
+          </div>
+          <div class="spread" style="margin-top:6px">
+            <button class="btn btn-ghost" type="button" data-go="1">{{ icon('left') }} Back</button>
+            <button class="btn btn-primary" type="submit">Continue to payment {{ icon('arrow') }}</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- STEP 3: payment -->
+      <section class="card card-pad pane" data-pane="3">
+        <h2 style="font-size:1.35rem">3. Payment</h2>
+        <div class="note warn" style="margin-bottom:18px">{{ icon('info') }}<span><b>Demo mode – no real payment is taken.</b> Use card <code>4242 4242 4242 4242</code>, any future expiry and any 3-digit CVV. Use <code>4000 0000 0000 0002</code> to see a declined payment.</span></div>
+        <div class="pay-methods" role="radiogroup" aria-label="Payment method">
+          <label class="pay-method"><input type="radio" name="method" value="card" checked>{{ icon('card') }} Card</label>
+          <label class="pay-method"><input type="radio" name="method" value="apple_pay"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.8-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8s1.9.8 3.2.8c1.3 0 2.1-1.2 2.9-2.4.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.4-1-2.4-4zM14 5.4c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4z"/></svg> Apple Pay</label>
+          <label class="pay-method"><input type="radio" name="method" value="google_pay"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.4L6.4 10c.8-2.3 3-4.1 5.6-4.1z"/></svg> Google Pay</label>
+          <label class="pay-method"><input type="radio" name="method" value="paypal"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#003087" d="M8.3 21H4.6a.5.5 0 0 1-.5-.6L6.8 3.5c.1-.3.3-.5.6-.5h6.3c3.2 0 5.2 1.6 4.7 4.6-.6 3.6-3 5.2-6.3 5.2H9.9c-.3 0-.5.2-.6.5z"/><path fill="#009CDE" d="M19.2 8c-.6 3.6-3 5.3-6.3 5.3h-1.4c-.3 0-.5.2-.6.5l-1 6.4-.3 1.7h3.2c.3 0 .5-.2.5-.5l.6-3.6c0-.3.3-.5.6-.5h.6c2.8 0 5-1.1 5.5-4.4.3-1.6 0-2.9-.9-3.7z"/></svg> PayPal</label>
+        </div>
+
+        <form data-card-form novalidate data-method-pane="card">
+          <div class="card-preview" aria-hidden="true">
+            <div class="spread"><span class="chip-ico"></span><b data-card-brand>CARD</b></div>
+            <div class="num" data-card-num>•••• •••• •••• ••••</div>
+            <div class="spread"><div><small>Card holder</small><b data-card-holder>YOUR NAME</b></div><div><small>Expires</small><b data-card-exp>MM/YY</b></div></div>
+          </div>
+          <div class="field"><label for="cc-number">Card Number</label>
+            <div class="input-icon"><input id="cc-number" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" maxlength="23"><span class="suffix" data-brand-suffix></span></div>
+            <span class="err" data-err="number"></span></div>
+          <div class="field-row">
+            <div class="field"><label for="cc-exp">Expiry Date</label><input id="cc-exp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" maxlength="5"><span class="err" data-err="expiry"></span></div>
+            <div class="field"><label for="cc-cvv">CVV</label><input id="cc-cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4"><span class="err" data-err="cvv"></span></div>
+          </div>
+          <div class="field"><label for="cc-name">Cardholder Name</label><input id="cc-name" autocomplete="cc-name" placeholder="Name as shown on card"><span class="err" data-err="holder"></span></div>
+        </form>
+
+        <div data-method-pane="apple_pay" class="hidden"><button type="button" class="wallet-btn wallet-apple" data-wallet="apple_pay"><svg viewBox="0 0 24 24" width="20" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.8-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8s1.9.8 3.2.8c1.3 0 2.1-1.2 2.9-2.4.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.4-1-2.4-4zM14 5.4c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4z"/></svg> Pay</button><p class="small muted" style="margin-top:8px">You'll confirm with Face ID / Touch ID (simulated).</p></div>
+        <div data-method-pane="google_pay" class="hidden"><button type="button" class="wallet-btn wallet-google" data-wallet="google_pay"><b style="color:#4285F4">G</b> Pay</button><p class="small muted" style="margin-top:8px">A Google Pay sheet will open (simulated).</p></div>
+        <div data-method-pane="paypal" class="hidden"><button type="button" class="wallet-btn wallet-paypal" data-wallet="paypal"><i style="font-weight:900">Pay</i><i style="font-weight:900;color:#009CDE">Pal</i></button><p class="small muted" style="margin-top:8px">You'll log in to PayPal in a pop-up (simulated).</p></div>
+
+        <div class="guarantee">{{ icon('shield') }}<div><b>ConcertTix Buyer Guarantee</b><p class="small" style="margin:4px 0 0">Full refund if your ticket is invalid, never arrives, or the event is cancelled. <a class="link" href="{{ url_for('public.refund') }}" target="_blank">Policy</a></p></div></div>
+        <label class="check" style="margin-bottom:18px"><input type="checkbox" data-terms> I agree to the <a class="link" href="{{ url_for('public.refund') }}" target="_blank">terms &amp; refund policy</a>.</label>
+        <div class="spread">
+          <button class="btn btn-ghost" type="button" data-go="2">{{ icon('left') }} Back</button>
+          <button class="btn btn-primary btn-lg" type="button" data-pay>{{ icon('shield') }} Pay <span data-sgd="{{ summary.total }}"></span></button>
+        </div>
+      </section>
+
+      <!-- STEP 4: confirmation -->
+      <section class="card card-pad pane" data-pane="4" style="text-align:center">
+        <div class="success-ico">{{ icon('check') }}</div>
+        <h2>You're going to {{ c.artist_name }}!</h2>
+        <p class="muted">Booking <b data-conf-ref></b> is confirmed. Your QR e-tickets are ready and a receipt has been sent to <b data-conf-email></b> (demo).</p>
+        <div class="card card-pad" style="text-align:left;max-width:460px;margin:18px auto;background:var(--surface-2);box-shadow:none">
+          <div class="summary-row"><span class="k">Concert</span><b>{{ c.title }}</b></div>
+          <div class="summary-row"><span class="k">Date</span><b>{{ c.date|date }} · {{ c.time|time }}</b></div>
+          <div class="summary-row"><span class="k">Seats</span><b data-conf-seats></b></div>
+          <div class="summary-row total"><span>Total paid</span><span data-conf-total></span></div>
+        </div>
+        <div class="row" style="justify-content:center">
+          <a class="btn btn-primary" data-conf-link href="#">{{ icon('qr') }} View e-tickets</a>
+          <a class="btn btn-outline" href="{{ url_for('account.bookings') }}">My bookings</a>
+        </div>
+      </section>
+    </div>
+
+    <aside class="card card-pad summary">
+      <h3>Order summary</h3>
+      <div class="mini-concert">
+        <img src="{{ c.image|image }}" alt="">
+        <div><b>{{ c.title }}</b><div class="muted small">{{ c.artist_name }}</div><div class="muted small">{{ c.date|date('%a %d %b %Y') }} · {{ c.time|time }}</div><div class="muted small">{{ c.venue }}, {{ c.city }}</div></div>
+      </div>
+      <div class="summary-row"><span class="k">Selected Seats</span><span class="seat-tags">{% for t in tickets %}<span class="seat-tag">{{ t.seat }}</span>{% endfor %}</span></div>
+      <div class="summary-row"><span class="k">Tickets</span><b>{{ summary.count }}</b></div>
+      {% for type, group in tickets|groupby('type') %}
+        <div class="summary-row small"><span class="k">{{ type }} × {{ group|length }}</span><span>{{ price(group|sum(attribute='price')) }}</span></div>
+      {% endfor %}
+      <div class="summary-row"><span class="k">Subtotal</span><b>{{ price(summary.subtotal) }}</b></div>
+      <div class="summary-row"><span class="k">Service Fee ({{ (summary.fee_rate * 100)|round|int }}%)</span><b>{{ price(summary.service_fee) }}</b></div>
+      <div class="summary-row total"><span>Total</span><span>{{ price(summary.total) }}</span></div>
+      <p class="small muted" style="margin:6px 0 0">No other fees. <span data-currency-note>Charged in <span data-currency-label></span> (S${{ '%.2f'|format(summary.total) }}).</span></p>
+      <div class="row" style="margin-top:14px">
+        <label for="co-currency" class="label">Pay in</label>
+        <select id="co-currency" class="currency-select" data-currency-select>{% for code in currency_codes %}<option value="{{ code }}">{{ code }}</option>{% endfor %}</select>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="pay-overlay hidden" data-overlay role="dialog" aria-modal="true" aria-labelledby="overlay-title">
+  <div class="pay-sheet">
+    <div class="spinner" data-overlay-spin></div>
+    <h3 id="overlay-title" data-overlay-title>Processing payment…</h3>
+    <p class="muted small" data-overlay-text>Please don't close this window.</p>
+    <div class="row hidden" data-overlay-actions style="justify-content:center;margin-top:10px">
+      <button class="btn btn-ghost" type="button" data-overlay-cancel>Cancel</button>
+      <button class="btn btn-primary" type="button" data-overlay-confirm>Confirm</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  window.CHECKOUT = {
+    payUrl: "{{ url_for('booking.pay', concert_id=c.id) }}",
+    seatsUrl: "{{ url_for('booking.seats', concert_id=c.id) }}",
+    holdSeconds: {{ hold_seconds }},
+    total: {{ summary.total }}
+  };
+</script>
+<script src="{{ url_for('static', filename='js/checkout.js') }}"></script>
+{% endblock %}

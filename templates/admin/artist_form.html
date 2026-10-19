@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+{% block admin_title %}{{ 'Edit artist' if a.id else 'Add artist' }}{% endblock %}
+{% block page_title %}{{ 'Edit artist' if a.id else 'Add artist' }}{% endblock %}
+{% block admin_content %}
+<a class="link small" href="{{ url_for('admin.artists') }}">← All artists</a>
+<form method="post" enctype="multipart/form-data" class="form-grid" style="margin-top:14px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <section class="card card-pad">
+    <div class="field"><label for="name">Name</label><input id="name" name="name" value="{{ a.name or '' }}" required></div>
+    <div class="field"><label for="genre">Genre</label><input id="genre" name="genre" value="{{ a.genre or '' }}" list="genres" required>
+      <datalist id="genres">{% for g in ['Pop','K-Pop','J-Pop','Rock','Indie Rock','Electronic','EDM','R&B','Hip-Hop','Jazz','Classical','Myanmar Pop'] %}<option>{{ g }}</option>{% endfor %}</datalist></div>
+    <div class="field"><label for="description">Description</label><textarea id="description" name="description" rows="6">{{ a.description or '' }}</textarea></div>
+    <div class="row"><button class="btn btn-primary" type="submit">Save artist</button><a class="btn btn-ghost" href="{{ url_for('admin.artists') }}">Cancel</a></div>
+  </section>
+  <section class="card card-pad">
+    <h3>Image</h3>
+    {% if a.image %}<img src="{{ a.image|image }}" alt="" style="width:140px;height:140px;border-radius:50%;object-fit:cover;margin-bottom:12px">{% endif %}
+    <div class="field"><label for="image">Upload image</label><input id="image" type="file" name="image" accept="image/*"></div>
+    <p class="muted small">Leave empty to auto-generate a monogram image.</p>
+  </section>
+</form>
+{% endblock %}

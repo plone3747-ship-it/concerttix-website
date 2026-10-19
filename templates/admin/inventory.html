@@ -1,0 +1,97 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% set tier_color = {'VVIP': 'var(--tier-vvip)', 'VIP': 'var(--tier-vip)', 'CAT 1': 'var(--tier-cat1)', 'General Admission': 'var(--tier-ga)'} %}
+{% block admin_title %}Inventory · {{ c.title }}{% endblock %}
+{% block page_title %}Ticket inventory{% endblock %}
+{% block admin_content %}
+<a class="link small" href="{{ url_for('admin.inventory_index') }}">← All concerts</a>
+<div class="spread" style="margin:10px 0 18px"><div><h2 style="margin:0">{{ c.title }}</h2><span class="muted">{{ c.artist }} · {{ c.date|date }} · {{ c.venue }}</span></div>
+  <a class="btn btn-outline btn-sm" href="{{ url_for('admin.concert_edit', cid=c.id) }}">{{ icon('edit') }} Edit concert</a></div>
+
+<div class="table-wrap" style="margin-bottom:22px">
+  <table class="table">
+    <thead><tr><th>Type</th><th>Total</th><th>Available</th><th>Held</th><th>Sold</th><th>Blocked</th><th>Price (SGD)</th></tr></thead>
+    <tbody>
+    {% for t in tiers %}
+      <tr>
+        <td><span class="row" style="gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:{{ tier_color[t.type] }}"></span><b>{{ t.type }}</b></span></td>
+        <td class="num">{{ t.total }}</td><td class="num">{{ t.available|int }}</td><td class="num">{{ t.held|int }}</td><td class="num">{{ t.sold|int }}</td><td class="num">{{ t.blocked|int }}</td>
+        <td>
+          <form method="post" action="{{ url_for('admin.inventory_price', cid=c.id) }}" class="row" style="gap:6px;flex-wrap:nowrap">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="type" value="{{ t.type }}">
+            <input class="input" style="width:110px;padding:8px 10px" type="number" step="0.01" min="0" name="price" value="{{ '%.2f'|format(t.price) }}" aria-label="{{ t.type }} price">
+            <button class="btn btn-outline btn-sm" type="submit">Update</button>
+          </form>
+          {% if t.price != t.max_price %}<span class="muted small">sold tickets keep their original price</span>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="chart-grid">
+  <section class="card card-pad">
+    <div class="panel-head"><h3>Seat map</h3>
+      <div class="row">
+        <span class="muted small" data-picked-count>0 selected</span>
+        <button class="btn btn-outline btn-sm" type="button" data-inv-action="block" disabled>Block selected</button>
+        <button class="btn btn-outline btn-sm" type="button" data-inv-action="release" disabled>Release selected</button>
+      </div>
+    </div>
+    <p class="muted small">Click a zone on the venue map to manage its seats. Then click available seats to block them, or blocked seats to release them. Sold and held seats can't be changed here.</p>
+    <div class="inv-zone-map">{% include "partials/zone_map.html" %}</div>
+    <div class="zone-tabs" data-zone-tabs>
+      {% for t in tiers %}
+        <button type="button" class="zone-tab" data-zone-tab="{{ t.type }}">
+          <i style="background:{{ tier_color[t.type] }}"></i>
+          <span><b>{{ 'GA' if t.type == 'General Admission' else t.type }}</b><small>{{ t.sold|int }} sold · {{ t.available|int }} left</small></span>
+        </button>
+      {% endfor %}
+    </div>
+    <div class="venue-map inv-map" style="padding:0;margin-top:16px">
+      <h4 class="zone-step" style="font-size:1rem;margin:4px 0 10px" data-inv-heading></h4>
+      {% for sec in layout if sec.rows %}
+        <div class="zone-grid hidden" data-zone="{{ sec.type }}">
+          {% for r in sec.rows %}
+            {% set seats = rows.get(r, []) %}
+            <div class="seat-row"><span class="row-label">{{ r }}</span>
+              {% for s in seats %}
+                {% if loop.index0 == (seats|length / 2)|round(0, 'ceil')|int %}<span class="aisle"></span>{% endif %}
+                <button type="button" class="seat {{ s.status }}" data-type="{{ s.type }}" data-id="{{ s.id }}" data-status="{{ s.status }}" title="{{ s.seat }} · {{ s.status }}" {{ 'disabled' if s.status in ('sold','held') }}>{{ s.seat_number }}</button>
+              {% endfor %}<span class="row-label">{{ r }}</span></div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+      <div class="note hidden" data-inv-ga style="margin-top:6px">{{ icon('info') }}<span>GA is a standing area with no seat numbers. Use the <b>General Admission</b> panel on the right to add, block or release standing spots.</span></div>
+      <div class="legend">
+        <span><i style="background:var(--tier-vvip)"></i>Available</span><span><i style="background:var(--seat-taken)"></i>Sold</span>
+        <span><i style="background:#E8A15A"></i>Held (checkout)</span><span><i style="background:var(--text);opacity:.7"></i>Blocked</span>
+      </div>
+    </div>
+  </section>
+  <section class="card card-pad">
+    <h3>General Admission</h3>
+    {% set ga = tiers|selectattr('type', 'equalto', 'General Admission')|first %}
+    {% if ga %}<p class="muted small">{{ ga.available|int }} available · {{ ga.sold|int }} sold · {{ ga.blocked|int }} blocked · {{ ga.total }} total</p>{% endif %}
+    <form method="post" action="{{ url_for('admin.inventory_ga', cid=c.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field"><label for="qty">Quantity</label><input id="qty" type="number" name="qty" min="1" max="1000" value="10"></div>
+      <div class="row">
+        <button class="btn btn-primary btn-sm" name="action" value="add">{{ icon('plus') }} Add spots</button>
+        <button class="btn btn-outline btn-sm" name="action" value="block">Block</button>
+        <button class="btn btn-outline btn-sm" name="action" value="release">Release</button>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}
+{% block admin_scripts %}
+<script>window.INVENTORY = {
+  toggleUrl: "{{ url_for('admin.inventory_toggle', cid=c.id) }}",
+  zones: {{ tiers|map(attribute='type')|list|tojson }},
+  stats: { {% for t in tiers %}"{{ t.type }}": { price: {{ t.price|float }}, sold: {{ t.sold|int }}, left: {{ t.available|int }}, total: {{ t.total }} }{{ ',' if not loop.last }}{% endfor %} },
+  notes: { {% for sec in layout %}"{{ sec.type }}": "{{ ('Rows ' ~ sec.rows[0] ~ '–' ~ sec.rows[-1]) if sec.rows else 'Standing' }} · {{ sec.note }}"{{ ',' if not loop.last }}{% endfor %} }
+};</script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

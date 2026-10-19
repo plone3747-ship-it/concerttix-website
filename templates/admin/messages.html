@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block admin_title %}Messages{% endblock %}
+{% block page_title %}Contact messages{% endblock %}
+{% block admin_content %}
+<div class="stack">
+{% for m in rows %}
+  <article class="card card-pad msg-item {{ 'unread' if not m.is_read }}">
+    <div class="spread"><div><b>{{ m.subject }}</b>{% if not m.is_read %} <span class="badge badge-blue">New</span>{% endif %}<div class="muted small">{{ m.name }} · <a class="link" href="mailto:{{ m.email }}">{{ m.email }}</a> · {{ m.created_at.strftime('%d %b %Y, %H:%M') }}</div></div>
+      <form method="post" action="{{ url_for('admin.message_action', mid=m.id) }}" class="actions">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-outline btn-sm" name="action" value="toggle">{{ 'Mark unread' if m.is_read else 'Mark read' }}</button>
+        <button class="icon-btn" name="action" value="delete" title="Delete" onclick="return confirm('Delete this message?')">{{ icon('trash') }}</button>
+      </form></div>
+    <p style="margin:12px 0 0;white-space:pre-line">{{ m.message }}</p>
+  </article>
+{% else %}<div class="card empty">{{ icon('inbox') }}<h3>Inbox zero</h3></div>{% endfor %}
+</div>
+{% endblock %}

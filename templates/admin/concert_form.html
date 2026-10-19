@@ -1,0 +1,70 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% set editing = c.id is defined and c.id %}
+{% block admin_title %}{{ 'Edit concert' if editing else 'Add concert' }}{% endblock %}
+{% block page_title %}{{ 'Edit concert' if editing else 'Add concert' }}{% endblock %}
+{% block admin_content %}
+<a class="link small" href="{{ url_for('admin.concerts') }}">← All concerts</a>
+<form method="post" enctype="multipart/form-data" class="form-grid" style="margin-top:14px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <section class="card card-pad">
+    <h3>Concert details</h3>
+    <div class="field"><label for="title">Title</label><input id="title" name="title" value="{{ c.title or '' }}" required placeholder="e.g. Moonlit World Tour 2026"></div>
+    <div class="field-row">
+      <div class="field"><label for="artist_id">Artist</label>
+        <select id="artist_id" name="artist_id" required data-artist-select>
+          <option value="">Choose artist…</option>
+          {% for a in artists %}<option value="{{ a.id }}" data-genre="{{ a.genre }}" {{ 'selected' if (c.artist_id|string) == (a.id|string) }}>{{ a.name }}</option>{% endfor %}
+        </select>
+        <a class="link small" href="{{ url_for('admin.artist_form') }}">+ New artist</a></div>
+      <div class="field"><label for="genre">Genre</label><input id="genre" name="genre" value="{{ c.genre or '' }}" placeholder="Filled from artist" data-genre-input></div>
+    </div>
+    <div class="field"><label for="venue_id">Venue</label>
+      <select id="venue_id" name="venue_id" required>
+        <option value="">Choose venue…</option>
+        {% for v in venues %}<option value="{{ v.id }}" {{ 'selected' if (c.venue_id|string) == (v.id|string) }}>{{ v.name }} · {{ v.city }} ({{ '{:,}'.format(v.capacity) }})</option>{% endfor %}
+      </select>
+      <a class="link small" href="{{ url_for('admin.venue_form') }}">+ New venue</a></div>
+    <div class="field-row">
+      <div class="field"><label for="date">Date</label><input id="date" type="date" name="date" value="{{ c.date if c.date else '' }}" required></div>
+      <div class="field"><label for="time">Time</label><input id="time" type="time" name="time" value="{{ time_input(c.time) if c.time is not string else c.time }}" required></div>
+      <div class="field"><label for="age_limit">Age limit</label>
+        <select id="age_limit" name="age_limit">{% for a in ['All ages','12+','16+','18+','21+'] %}<option {{ 'selected' if c.age_limit == a }}>{{ a }}</option>{% endfor %}</select></div>
+    </div>
+    <div class="field"><label for="description">Description</label><textarea id="description" name="description" rows="5">{{ c.description or '' }}</textarea></div>
+    <div class="field-row">
+      <div class="field"><label for="status">Status</label>
+        <select id="status" name="status">{% for s in ['on_sale','sold_out','cancelled','completed','draft'] %}<option value="{{ s }}" {{ 'selected' if c.status == s }}>{{ s|label }}</option>{% endfor %}</select></div>
+      <div class="field" style="align-self:end"><label class="check"><input type="checkbox" name="featured" value="1" {{ 'checked' if c.featured }}> Feature on home page</label></div>
+    </div>
+  </section>
+
+  <div class="stack">
+    <section class="card card-pad">
+      <h3>Ticket prices (SGD)</h3>
+      <p class="muted small">{{ 'Changing a price updates all unsold tickets of that type.' if editing else 'Creates the seat inventory: VVIP 24 seats, VIP 48, CAT 1 100, GA 120 standing.' }}</p>
+      {% for t in tiers %}
+        <div class="field"><label for="p{{ loop.index }}">{{ t }}</label>
+          <input id="p{{ loop.index }}" type="number" min="0" step="0.01" name="price_{{ t.replace(' ', '_') }}" value="{{ '%.2f'|format(prices.get(t, 0)) }}" required></div>
+      {% endfor %}
+    </section>
+    <section class="card card-pad">
+      <h3>Poster image</h3>
+      {% if c.image %}<img class="preview-img" src="{{ c.image|image }}" alt="Current poster" style="margin-bottom:12px">{% endif %}
+      <div class="field"><label for="image">Upload image (PNG, JPG, WEBP, SVG · max 5 MB)</label><input id="image" type="file" name="image" accept="image/*"></div>
+      <p class="muted small">Leave empty to auto-generate a branded poster.</p>
+      {% if editing %}<label class="check"><input type="checkbox" name="regenerate" value="1"> Regenerate the poster from the new details</label>{% endif %}
+    </section>
+    <div class="row"><button class="btn btn-primary btn-lg" type="submit">{{ 'Save changes' if editing else 'Create concert' }}</button>
+      <a class="btn btn-ghost" href="{{ url_for('admin.concerts') }}">Cancel</a></div>
+  </div>
+</form>
+{% endblock %}
+{% block admin_scripts %}
+<script>
+  (function () {
+    var sel = document.querySelector('[data-artist-select]'), g = document.querySelector('[data-genre-input]');
+    sel.addEventListener('change', function () { var o = sel.selectedOptions[0]; if (o && o.dataset.genre) g.value = o.dataset.genre; });
+  })();
+</script>
+{% endblock %}

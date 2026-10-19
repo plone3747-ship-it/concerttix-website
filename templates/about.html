@@ -1,0 +1,802 @@
+{% extends "base.html" %} {% from "partials/macros.html" import icon with
+context %} {% block title %}About us{% endblock %} {% block description
+%}ConcertTix is a concert ticketing platform built on transparency: interactive
+seat maps, one up-front fee, instant QR e-tickets and a Buyer Guarantee on every
+order.{% endblock %} {% block head %}
+<style>
+  /* ---------- About page only ---------- */
+  .ab-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 84px 0 72px;
+    background: var(--brown);
+    color: var(--cream);
+  }
+  :root[data-theme="dark"] .ab-hero {
+    background: #120d0c;
+    border-bottom: 1px solid var(--border);
+  }
+  .ab-hero .rings {
+    position: absolute;
+    right: -160px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 620px;
+    height: 620px;
+    opacity: 0.45;
+    pointer-events: none;
+  }
+  .ab-hero .kicker {
+    color: var(--blue);
+  }
+  .ab-hero h1 {
+    max-width: 760px;
+    margin: 14px 0 20px;
+    font-size: clamp(2.2rem, 5.2vw, 4rem);
+    letter-spacing: -0.035em;
+  }
+  .ab-hero h1 em {
+    font-style: normal;
+    color: var(--blue);
+  }
+  .ab-hero p.lead {
+    max-width: 600px;
+    font-size: 1.15rem;
+    opacity: 0.85;
+    margin: 0;
+  }
+  .ab-hero .row {
+    margin-top: 32px;
+  }
+  .ab-hero .btn-light {
+    background: var(--cream);
+    color: var(--brown);
+  }
+  .ab-hero .btn-line {
+    background: transparent;
+    color: var(--cream);
+    border-color: rgba(254, 239, 182, 0.4);
+  }
+  .ab-hero .btn-line:hover {
+    border-color: var(--cream);
+  }
+
+  .ab-facts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    margin-top: -40px;
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+  }
+  .ab-facts > div {
+    padding: 26px 24px;
+    border-left: 1px solid var(--border);
+  }
+  .ab-facts > div:first-child {
+    border-left: 0;
+  }
+  .ab-facts b {
+    display: block;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+  }
+  .ab-facts span {
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+  @media (max-width: 760px) {
+    .ab-facts {
+      grid-template-columns: 1fr 1fr;
+    }
+    .ab-facts > div:nth-child(3) {
+      border-left: 0;
+    }
+    .ab-facts > div:nth-child(n + 3) {
+      border-top: 1px solid var(--border);
+    }
+  }
+
+  .ab-section {
+    padding: 88px 0 0;
+  }
+  .ab-split {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 56px;
+    align-items: center;
+  }
+  @media (max-width: 900px) {
+    .ab-split {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+  .ab-split h2 {
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+  }
+  .ab-split p {
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+  .ab-quote {
+    border-left: 4px solid var(--accent-ink);
+    padding: 6px 0 6px 20px;
+    margin: 26px 0 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .ab-visual {
+    position: relative;
+    aspect-ratio: 5 / 4;
+    border-radius: 26px;
+    overflow: hidden;
+    background: var(--blue);
+  }
+  .ab-visual > svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .ab-visual .tag {
+    position: absolute;
+    left: 22px;
+    bottom: 22px;
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 14px;
+    padding: 12px 16px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.92rem;
+  }
+
+  .ab-head {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 40px;
+  }
+  .ab-head h2 {
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+  }
+  .ab-head p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin: 0;
+  }
+
+  .ab-values {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 900px) {
+    .ab-values {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ab-value {
+    padding: 30px;
+    border-radius: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .ab-value .num {
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+  .ab-value h3 {
+    font-size: 1.3rem;
+    margin: 14px 0 10px;
+  }
+  .ab-value p {
+    color: var(--muted);
+    margin: 0;
+  }
+  .ab-value:nth-child(1) {
+    background: var(--cream);
+    border-color: transparent;
+    color: var(--brown);
+  }
+  .ab-value:nth-child(1) p,
+  .ab-value:nth-child(1) .num {
+    color: #6e4f4c;
+  }
+  .ab-value:nth-child(2) {
+    background: var(--blue);
+    border-color: transparent;
+    color: #23303a;
+  }
+  .ab-value:nth-child(2) p,
+  .ab-value:nth-child(2) .num {
+    color: #3f5463;
+  }
+
+  .ab-offer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  @media (max-width: 900px) {
+    .ab-offer {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .ab-offer {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ab-offer > div {
+    background: var(--surface);
+    padding: 28px;
+  }
+  .ab-offer .ico {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: var(--surface-2);
+    margin-bottom: 16px;
+  }
+  .ab-offer h3 {
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+  }
+  .ab-offer p {
+    color: var(--muted);
+    font-size: 0.93rem;
+    margin: 0;
+  }
+
+  .ab-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    counter-reset: s;
+  }
+  @media (max-width: 900px) {
+    .ab-steps {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .ab-steps {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ab-step {
+    position: relative;
+    padding-top: 22px;
+    border-top: 2px solid var(--text);
+  }
+  .ab-step::before {
+    counter-increment: s;
+    content: "0" counter(s);
+    display: block;
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    color: var(--accent-ink);
+    margin-bottom: 14px;
+  }
+  .ab-step h3 {
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+  }
+  .ab-step p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .ab-promise {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    align-items: center;
+    padding: 40px;
+    border-radius: 24px;
+    background: var(--success-bg);
+    border: 1.5px solid color-mix(in srgb, var(--success) 35%, var(--border));
+  }
+  .ab-promise .shield {
+    width: 84px;
+    height: 84px;
+    border-radius: 22px;
+    display: grid;
+    place-items: center;
+    background: var(--surface);
+    color: var(--success);
+  }
+  .ab-promise .shield svg {
+    width: 42px;
+    height: 42px;
+  }
+  .ab-promise h2 {
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    margin-bottom: 8px;
+  }
+  .ab-promise ul {
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    font-weight: 700;
+  }
+  .ab-promise li {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .ab-promise li svg {
+    color: var(--success);
+    width: 18px;
+    height: 18px;
+  }
+  @media (max-width: 640px) {
+    .ab-promise {
+      grid-template-columns: 1fr;
+      padding: 28px;
+    }
+  }
+
+  .ab-cities {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 760px) {
+    .ab-cities {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .ab-city {
+    padding: 22px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s;
+  }
+  .ab-city:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+  .ab-city small {
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .ab-city b {
+    display: block;
+    font-size: 1.25rem;
+    margin: 4px 0 10px;
+  }
+  .ab-city span {
+    color: var(--accent-ink);
+    font-weight: 700;
+    font-size: 0.88rem;
+  }
+
+  .ab-team {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 40px;
+    align-items: center;
+    padding: 40px;
+    border-radius: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  @media (max-width: 760px) {
+    .ab-team {
+      grid-template-columns: 1fr;
+      padding: 28px;
+      gap: 24px;
+    }
+  }
+  .ab-person {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+  }
+  .ab-avatar {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    background: var(--brown);
+    color: var(--cream);
+    flex: none;
+  }
+  :root[data-theme="dark"] .ab-avatar {
+    background: var(--cream);
+    color: var(--brown);
+  }
+  .ab-person b {
+    font-size: 1.2rem;
+    display: block;
+  }
+  .ab-person div span {
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .ab-team p {
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .ab-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .ab-cta {
+    margin: 88px 0 20px;
+    padding: 56px 40px;
+    border-radius: 28px;
+    background: var(--primary);
+    color: var(--on-primary);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .ab-cta h2 {
+    font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+    margin-bottom: 10px;
+  }
+  .ab-cta p {
+    opacity: 0.82;
+    max-width: 520px;
+    margin: 0 auto 26px;
+  }
+  .ab-cta .btn-a {
+    background: var(--on-primary);
+    color: var(--primary);
+  }
+  .ab-cta .btn-b {
+    background: transparent;
+    color: var(--on-primary);
+    border-color: currentColor;
+  }
+  .ab-cta .row {
+    justify-content: center;
+  }
+</style>
+{% endblock %} {% block content %}
+<!-- ============ HERO ============ -->
+<section class="ab-hero">
+  <svg class="rings" viewBox="0 0 400 400" aria-hidden="true">
+    <g fill="none" stroke-width="2.5">
+      {% for r in range(24, 200, 22) %}
+      <circle
+        cx="200"
+        cy="200"
+        r="{{ r }}"
+        stroke="{{ '#C3DAE8' if loop.index is odd else '#FEEFB6' }}"
+      />
+      {% endfor %}
+    </g>
+  </svg>
+  <div class="container">
+    <span class="kicker">About ConcertTix</span>
+    <h1>We make getting to the show <em>as good as</em> the show itself.</h1>
+    <p class="lead">
+      ConcertTix is a concert ticketing platform built for fans in Singapore and
+      across Southeast Asia: honest prices, the exact seat you want, and a
+      ticket on your phone the moment you book.
+    </p>
+    <div class="row">
+      <a class="btn btn-light btn-lg" href="{{ url_for('public.concerts') }}"
+        >Explore concerts</a
+      >
+      <a class="btn btn-line btn-lg" href="{{ url_for('public.contact') }}"
+        >Contact us</a
+      >
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <!-- ============ KEY FACTS ============ -->
+  <div class="ab-facts" role="list">
+    <div role="listitem">
+      <b>5%</b><span>One service fee, shown up front</span>
+    </div>
+    <div role="listitem">
+      <b>10 min</b><span>Seat hold while you check out</span>
+    </div>
+    <div role="listitem"><b>7</b><span>Currencies supported</span></div>
+    <div role="listitem">
+      <b>24/7</b><span>Help from our assistant, Tixie</span>
+    </div>
+  </div>
+
+  <!-- ============ OUR STORY ============ -->
+  <section class="ab-section ab-split">
+    <div class="ab-visual" aria-hidden="true">
+      <svg viewBox="0 0 500 400" preserveAspectRatio="xMidYMid slice">
+        <rect width="500" height="400" fill="#C3DAE8" />
+        <circle cx="330" cy="150" r="200" fill="#FEEFB6" />
+        {% for i in range(26) %} {% set h = [40, 90, 150, 70, 120, 200, 110, 60,
+        170, 130, 80, 220, 140, 95, 180, 60, 125, 210, 100, 75, 160, 115, 55,
+        145, 90, 65][i] %}
+        <rect
+          x="{{ 20 + i * 18.5 }}"
+          y="{{ 300 - h }}"
+          width="10"
+          height="{{ h }}"
+          rx="5"
+          fill="#432F2E"
+          opacity="{{ 0.95 if i % 3 else 0.55 }}"
+        />
+        {% endfor %}
+        <rect x="0" y="300" width="500" height="100" fill="#432F2E" />
+      </svg>
+      <div class="tag">{{ icon('qr') }} Your ticket, ready in seconds</div>
+    </div>
+    <div>
+      <span class="kicker">Our story</span>
+      <h2>Born from the frustration of buying a ticket.</h2>
+      <p>
+        Live music has moved online, but buying a ticket often hasn't caught up.
+        Fans are sent away from the page to pick a seat, surprised by fees at
+        the very last step, asked to queue for paper tickets, or left with
+        nowhere to turn when a show is cancelled.
+      </p>
+      <p>
+        ConcertTix started with a simple idea: put everything a fan needs into
+        one clear, trustworthy booking experience, and give organisers the tools
+        to run their shows just as smoothly.
+      </p>
+      <p class="ab-quote">
+        “The price you see is the price you pay. The seat you pick is the seat
+        you get.”
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ MISSION & VALUES ============ -->
+  <section class="ab-section">
+    <div class="ab-head">
+      <span class="kicker">What we stand for</span>
+      <h2>Our mission and values</h2>
+      <p>
+        Our mission is to make every step between “I want to go” and “I'm in”
+        fast, fair and transparent.
+      </p>
+    </div>
+    <div class="ab-values">
+      <article class="ab-value">
+        <span class="num">01</span>
+        <h3>Transparency first</h3>
+        <p>
+          Every charge is itemised before you pay. No hidden fees, no surprises
+          at checkout, ever.
+        </p>
+      </article>
+      <article class="ab-value">
+        <span class="num">02</span>
+        <h3>Fans before everything</h3>
+        <p>
+          We design for the person holding the ticket: clear seat maps, simple
+          checkout and help whenever you need it.
+        </p>
+      </article>
+      <article class="ab-value">
+        <span class="num">03</span>
+        <h3>Trust you can count on</h3>
+        <p>
+          Every booking is protected by our Buyer Guarantee, and every ticket
+          carries its own secure QR code.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ WHAT WE OFFER ============ -->
+  <section class="ab-section">
+    <div class="ab-head">
+      <span class="kicker">The ConcertTix experience</span>
+      <h2>Everything you need, in one place</h2>
+    </div>
+    <div class="ab-offer">
+      <div>
+        <span class="ico">{{ icon('eye') }}</span>
+        <h3>Interactive seat maps</h3>
+        <p>
+          See the stage, compare sections and choose your exact seat with live
+          availability.
+        </p>
+      </div>
+      <div>
+        <span class="ico">{{ icon('receipt') }}</span>
+        <h3>Up-front pricing</h3>
+        <p>
+          One 5% service fee, shown on the seat map before checkout. The total
+          you see is the total you pay.
+        </p>
+      </div>
+      <div>
+        <span class="ico">{{ icon('qr') }}</span>
+        <h3>Instant QR e-tickets</h3>
+        <p>
+          Each seat gets its own QR code in My Tickets. Nothing to collect,
+          nothing to lose.
+        </p>
+      </div>
+      <div>
+        <span class="ico">{{ icon('shield') }}</span>
+        <h3>Buyer Guarantee</h3>
+        <p>
+          Covered for invalid tickets, tickets not delivered and cancelled
+          events.
+        </p>
+      </div>
+      <div>
+        <span class="ico">{{ icon('globe') }}</span>
+        <h3>Your currency</h3>
+        <p>Browse prices in SGD, USD, EUR, GBP, MYR, THB or MMK.</p>
+      </div>
+      <div>
+        <span class="ico">{{ icon('sparkle') }}</span>
+        <h3>Tixie, our assistant</h3>
+        <p>
+          Ask what's on this weekend, how fees work or how to get a refund, and
+          get an answer instantly.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section class="ab-section">
+    <div class="ab-head">
+      <span class="kicker">How it works</span>
+      <h2>From browsing to the front door in four steps</h2>
+    </div>
+    <div class="ab-steps">
+      <div class="ab-step">
+        <h3>Discover</h3>
+        <p>Search by artist, city, genre or date, or ask Tixie for ideas.</p>
+      </div>
+      <div class="ab-step">
+        <h3>Choose your seat</h3>
+        <p>Pick exact seats on the live map. We hold them for 10 minutes.</p>
+      </div>
+      <div class="ab-step">
+        <h3>Check out securely</h3>
+        <p>
+          Pay by card, Apple Pay, Google Pay or PayPal, with every fee shown
+          first.
+        </p>
+      </div>
+      <div class="ab-step">
+        <h3>Show your QR</h3>
+        <p>
+          Your e-tickets appear instantly. Scan in at the door and enjoy the
+          show.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BUYER GUARANTEE ============ -->
+  <section class="ab-section">
+    <div class="ab-promise">
+      <div class="shield">{{ icon('shield') }}</div>
+      <div>
+        <h2>The ConcertTix Buyer Guarantee</h2>
+        <p class="muted" style="margin: 0">
+          Every order is protected. If something goes wrong with your ticket,
+          you get a full refund, including the service fee.
+        </p>
+        <ul>
+          <li>{{ icon('check') }} Invalid tickets</li>
+          <li>{{ icon('check') }} Tickets not delivered</li>
+          <li>{{ icon('check') }} Cancelled events</li>
+        </ul>
+        <a
+          class="link small"
+          style="display: inline-block; margin-top: 14px"
+          href="{{ url_for('public.refund') }}"
+          >Read our refund policy</a
+        >
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CITIES ============ -->
+  <section class="ab-section">
+    <div class="ab-head">
+      <span class="kicker">Where we are</span>
+      <h2>Live music across Southeast Asia</h2>
+      <p>
+        Headquartered in Singapore, with concerts in cities around the region.
+      </p>
+    </div>
+    <div class="ab-cities">
+      {% for city, country in [('Singapore', 'Headquarters'), ('Kuala Lumpur',
+      'Malaysia'), ('Bangkok', 'Thailand'), ('Yangon', 'Myanmar')] %}
+      <a class="ab-city" href="{{ url_for('public.concerts', city=city) }}">
+        <small>{{ country }}</small><b>{{ city }}</b><span>See concerts →</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ============ TEAM ============ -->
+  <section class="ab-section">
+    <div class="ab-team">
+      <div class="ab-person">
+        <span class="ab-avatar" aria-hidden="true">AK</span>
+        <div>
+          <span class="kicker">Founder</span><b>Aung Phone Khant</b
+          ><span>Founder &amp; Lead Developer</span>
+        </div>
+      </div>
+      <div>
+        <p>
+          ConcertTix was designed and built by Aung Phone Khant as part of a BSc
+          Computing Science final year project, with one goal: a ticketing
+          platform fans can trust from the first click to the final encore.
+        </p>
+        <div class="ab-stack">
+          {% for t in ['Python Flask', 'MySQL', 'HTML', 'CSS', 'JavaScript']
+          %}<span class="badge">{{ t }}</span>{% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="ab-cta">
+    <h2>Your next great night out is waiting.</h2>
+    <p>
+      Find a concert, pick your seat and have your ticket on your phone in
+      minutes.
+    </p>
+    <div class="row">
+      <a class="btn btn-a btn-lg" href="{{ url_for('public.concerts') }}"
+        >Browse concerts</a
+      >
+      {% if not current_user %}<a
+        class="btn btn-b btn-lg"
+        href="{{ url_for('auth.signup') }}"
+        >Create free account</a
+      >{% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

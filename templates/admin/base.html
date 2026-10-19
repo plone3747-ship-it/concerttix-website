@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import icon, logo_mark with context %}
+{% block title %}{% block admin_title %}Admin{% endblock %} · Admin{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block chat %}{% endblock %}
+{% block content %}
+{% set ep = request.endpoint or '' %}
+<div class="admin">
+  <aside class="sidebar" data-sidebar aria-label="Admin navigation">
+    <a href="{{ url_for('admin.dashboard') }}" class="logo">{{ logo_mark() }}<span class="logo-word">concert<span class="tix">tix</span></span></a>
+    <a class="side-link {{ 'active' if ep == 'admin.dashboard' }}" href="{{ url_for('admin.dashboard') }}">{{ icon('chart') }} Dashboard</a>
+    <div class="side-label">Catalogue</div>
+    <a class="side-link {{ 'active' if ep.startswith('admin.concert') }}" href="{{ url_for('admin.concerts') }}">{{ icon('music') }} Concerts</a>
+    <a class="side-link {{ 'active' if ep.startswith('admin.artist') }}" href="{{ url_for('admin.artists') }}">{{ icon('mic') }} Artists</a>
+    <a class="side-link {{ 'active' if ep.startswith('admin.venue') }}" href="{{ url_for('admin.venues') }}">{{ icon('building') }} Venues</a>
+    <a class="side-link {{ 'active' if ep.startswith('admin.inventory') }}" href="{{ url_for('admin.inventory_index') }}">{{ icon('layers') }} Ticket inventory</a>
+    <div class="side-label">Sales</div>
+    <a class="side-link {{ 'active' if ep.startswith('admin.order') }}" href="{{ url_for('admin.orders') }}">{{ icon('receipt') }} Orders</a>
+    <a class="side-link {{ 'active' if ep.startswith('admin.customer') }}" href="{{ url_for('admin.customers') }}">{{ icon('users') }} Customers</a>
+    <a class="side-link {{ 'active' if ep.startswith('admin.claim') }}" href="{{ url_for('admin.claims') }}">{{ icon('shield') }} Guarantee claims {% if open_claims %}<span class="count">{{ open_claims }}</span>{% endif %}</a>
+    <div class="side-label">Event day</div>
+    <a class="side-link {{ 'active' if ep.startswith('admin.checkin') }}" href="{{ url_for('admin.checkin') }}">{{ icon('scan') }} Door check-in</a>
+    <a class="side-link {{ 'active' if ep.startswith('admin.message') }}" href="{{ url_for('admin.messages') }}">{{ icon('inbox') }} Messages {% if unread_messages %}<span class="count">{{ unread_messages }}</span>{% endif %}</a>
+    <div style="margin-top:auto;padding-top:20px">
+      <a class="side-link" href="{{ url_for('public.home') }}">{{ icon('home') }} View website</a>
+      <form method="post" action="{{ url_for('auth.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="side-link" style="background:none;border:0;width:100%;cursor:pointer;font:inherit" type="submit">{{ icon('logout') }} Log out</button></form>
+    </div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-top">
+      <button class="icon-btn admin-side-toggle" type="button" data-side-toggle aria-label="Open navigation">{{ icon('menu') }}</button>
+      <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+      <div class="nav-right">
+        {% block top_actions %}{% endblock %}
+        <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Switch dark / light mode">{{ icon('moon', 'icon moon') }}{{ icon('sun', 'icon sun') }}</button>
+        <span class="avatar" title="{{ current_user.name }}">{{ current_user.name[:1] }}</span>
+      </div>
+    </header>
+    <div class="admin-content">{% block admin_content %}{% endblock %}</div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function () {
+    var b = document.querySelector('[data-side-toggle]'), s = document.querySelector('[data-sidebar]');
+    if (b) b.addEventListener('click', function (e) { e.stopPropagation(); s.classList.toggle('open'); });
+    document.addEventListener('click', function (e) { if (!s.contains(e.target)) s.classList.remove('open'); });
+    document.querySelectorAll('[data-confirm]').forEach(function (f) {
+      f.addEventListener('submit', function (e) { if (!confirm(f.dataset.confirm)) e.preventDefault(); });
+    });
+  })();
+</script>
+{% block admin_scripts %}{% endblock %}
+{% endblock %}

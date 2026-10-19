@@ -1,0 +1,69 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block admin_title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block top_actions %}<a class="btn btn-primary btn-sm hide-mobile" href="{{ url_for('admin.concert_new') }}">{{ icon('plus') }} Add concert</a>{% endblock %}
+{% block admin_content %}
+<div class="stat-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))">
+  <div class="card kpi"><span class="ico">{{ icon('receipt') }}</span><small>Total Sales</small><b class="num">{{ '{:,}'.format(stats.sales) }}</b><span class="sub">paid orders</span></div>
+  <div class="card kpi"><span class="ico">{{ icon('ticket') }}</span><small>Tickets Sold</small><b class="num">{{ '{:,}'.format(stats.tickets|int) }}</b><span class="sub">{{ stats.tickets_30 }} in last 30 days</span></div>
+  <div class="card kpi"><span class="ico">{{ icon('users') }}</span><small>Total Users</small><b class="num">{{ '{:,}'.format(stats.users) }}</b><span class="sub">registered customers</span></div>
+  <div class="card kpi"><span class="ico">{{ icon('calendar') }}</span><small>Upcoming Events</small><b class="num">{{ stats.upcoming }}</b><span class="sub">on sale or sold out</span></div>
+  <div class="card kpi"><span class="ico">{{ icon('chart') }}</span><small>Revenue</small><b class="num">{{ stats.revenue|money }}</b><span class="sub">{{ stats.revenue_30|money }} last 30 days · fees {{ stats.fees|money }}</span></div>
+</div>
+
+<div class="chart-grid" style="margin-top:18px">
+  <section class="card card-pad">
+    <div class="panel-head"><h3>Ticket sales · last 30 days</h3><span class="muted small">tickets per day</span></div>
+    <div class="chart-box"><canvas id="salesChart" aria-label="Tickets sold per day for the last 30 days" role="img"></canvas></div>
+  </section>
+  <section class="card card-pad">
+    <div class="panel-head"><h3>Sales by ticket type</h3></div>
+    <div class="chart-box"><canvas id="typeChart" aria-label="Tickets sold by type" role="img"></canvas></div>
+  </section>
+</div>
+<div class="chart-grid" style="margin-top:18px;grid-template-columns:1fr 1fr">
+  <section class="card card-pad">
+    <div class="panel-head"><h3>Revenue · last 6 months</h3><span class="muted small">SGD</span></div>
+    <div class="chart-box"><canvas id="revenueChart" aria-label="Monthly revenue" role="img"></canvas></div>
+  </section>
+  <section class="card card-pad">
+    <div class="panel-head"><h3>Popular concerts</h3><span class="muted small">tickets sold</span></div>
+    <div class="chart-box"><canvas id="popularChart" aria-label="Most popular concerts by tickets sold" role="img"></canvas></div>
+  </section>
+</div>
+
+<div class="chart-grid" style="margin-top:18px;grid-template-columns:1.4fr 1fr">
+  <section class="card card-pad">
+    <div class="panel-head"><h3>Recent orders</h3><a class="link small" href="{{ url_for('admin.orders') }}">View all</a></div>
+    <div class="table-wrap" style="border:0">
+      <table class="table">
+        <thead><tr><th>Order</th><th>Customer</th><th>Concert</th><th>Total</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for o in recent %}
+          <tr><td><a class="link" href="{{ url_for('admin.order_detail', oid=o.id) }}">{{ o.order_ref }}</a><div class="muted small">{{ o.order_date.strftime('%d %b, %H:%M') }}</div></td>
+            <td>{{ o.customer_name }}</td><td>{{ o.title }}</td><td class="num">{{ o.total|money }}</td>
+            <td><span class="badge badge-{{ o.payment_status }}">{{ o.payment_status|label }}</span></td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <section class="card card-pad">
+    <div class="panel-head"><h3>Upcoming events</h3><a class="link small" href="{{ url_for('admin.concerts') }}">Manage</a></div>
+    {% for u in upcoming %}
+      {% set pct = ((u.sold or 0) / (u.cap or 1) * 100)|round|int %}
+      <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+        <div class="spread"><b class="small">{{ u.title }}</b><span class="small muted">{{ u.date|date('%d %b') }}</span></div>
+        <div class="spread small muted"><span>{{ u.artist }} · {{ u.venue }}</span><span>{{ pct }}% sold</span></div>
+        <div class="bar" style="margin-top:6px"><span style="width:{{ pct }}%"></span></div>
+      </div>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
+<script>window.DASH = {{ charts|tojson }};</script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

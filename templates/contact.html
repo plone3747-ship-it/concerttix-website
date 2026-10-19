@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import icon with context %}
+{% block title %}Contact{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="page-head"><span class="kicker">Contact</span><h1>We're here to help</h1><p>Questions about a booking, a venue or a refund? Send us a message, or ask Tixie in the chat for an instant answer.</p></header>
+  <div class="two-col" style="padding-bottom:40px">
+    <form class="card card-pad" method="post" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field-row">
+        <div class="field"><label for="name">Your name</label><input id="name" name="name" value="{{ form.name }}" required></div>
+        <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" value="{{ form.email }}" required></div>
+      </div>
+      <div class="field"><label for="subject">Subject</label><input id="subject" name="subject" value="{{ form.subject }}" placeholder="e.g. Question about order CTX26…" required></div>
+      <div class="field"><label for="message">Message</label><textarea id="message" name="message" required>{{ form.message }}</textarea></div>
+      <button class="btn btn-primary" type="submit">Send message</button>
+    </form>
+    <aside class="stack">
+      <div class="card card-pad">
+        <div class="row" style="flex-wrap:nowrap">{{ icon('mail') }}<div><b>Email</b><div class="muted small">support@concerttix.com</div></div></div>
+        <div class="divider" style="margin:16px 0"></div>
+        <div class="row" style="flex-wrap:nowrap">{{ icon('phone') }}<div><b>Phone</b><div class="muted small">+65 6123 4567 · Mon–Fri, 10am–7pm SGT</div></div></div>
+        <div class="divider" style="margin:16px 0"></div>
+        <div class="row" style="flex-wrap:nowrap">{{ icon('pin') }}<div><b>Office</b><div class="muted small">ConcertTix (demo), Singapore</div></div></div>
+      </div>
+      <div class="card card-pad"><b>Quick answers</b><p class="muted small" style="margin:6px 0 10px">Most questions are answered in our FAQ and refund policy.</p>
+        <div class="row"><a class="btn btn-outline btn-sm" href="{{ url_for('public.faq') }}">FAQ</a><a class="btn btn-outline btn-sm" href="{{ url_for('public.refund') }}">Refund policy</a></div></div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

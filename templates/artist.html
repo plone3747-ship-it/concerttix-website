@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import concert_card with context %}
+{% block title %}{{ a.name }}{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="page-head row" style="gap:24px;align-items:center">
+    <img src="{{ a.image|image }}" alt="{{ a.name }}" style="width:140px;height:140px;border-radius:50%;object-fit:cover;box-shadow:var(--shadow)">
+    <div style="flex:1;min-width:240px">
+      <span class="badge badge-blue">{{ a.genre }}</span>
+      <h1 style="margin:10px 0 8px">{{ a.name }}</h1>
+      <p>{{ a.description }}</p>
+    </div>
+  </header>
+  <section class="section-sm">
+    <h2>Shows</h2>
+    {% if shows %}
+      <div class="grid grid-3">{% for c in shows %}{{ concert_card(c, favs) }}{% endfor %}</div>
+    {% else %}
+      <p class="muted">No shows announced yet.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

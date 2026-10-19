@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import icon, price, concert_card with context %}
+{% block title %}Concert tickets in Singapore & Asia{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow"><span class="dot"></span> {{ stats.concerts }} concerts on sale now</span>
+      <h1>Your next <span class="hl">favourite night</span> starts with the right seat.</h1>
+      <p class="lead">Pick your exact seat on a live map, see every fee before you pay, and get a QR e-ticket the moment you book.</p>
+      <form class="search-bar" action="{{ url_for('public.concerts') }}" role="search">
+        <label for="hero-q" class="sr-only">Search concerts</label>
+        <input id="hero-q" name="q" placeholder="Search artists, concerts or venues">
+        <label for="hero-city" class="sr-only">City</label>
+        <select id="hero-city" name="city">
+          <option value="">All cities</option>
+          {% for c in cities %}<option>{{ c }}</option>{% endfor %}
+        </select>
+        <button class="btn btn-primary" type="submit">{{ icon('search') }}<span class="hide-mobile">Search</span></button>
+      </form>
+      <div class="hero-stats">
+        <div><b class="num">{{ stats.concerts }}</b><span>Upcoming shows</span></div>
+        <div><b class="num">{{ stats.cities }}</b><span>Cities</span></div>
+        <div><b class="num">{{ '{:,}'.format(stats.fans) }}</b><span>Happy fans</span></div>
+      </div>
+    </div>
+    <div class="hero-stack" aria-hidden="true">
+      {% for c in featured[:3] %}
+        <a class="poster p{{ loop.index }}" href="{{ url_for('public.concert_detail', concert_id=c.id) }}" tabindex="-1"><img src="{{ c.image|image }}" alt=""></a>
+      {% endfor %}
+      {% if featured %}
+      <div class="ticket-chip">{{ icon('qr') }} <span>E-ticket ready<br><span class="muted small">{{ featured[0].artist_name }} · Row A</span></span></div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="pills" aria-label="Browse by genre">
+      <a class="pill active" href="{{ url_for('public.concerts') }}">All</a>
+      {% for g in genres %}<a class="pill" href="{{ url_for('public.concerts', genre=g) }}">{{ g }}</a>{% endfor %}
+    </div>
+  </div>
+</section>
+
+{% if featured %}
+<section class="section-sm">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="kicker">Featured</span><h2>Headline shows</h2></div>
+      <a class="btn btn-outline btn-sm" href="{{ url_for('public.concerts') }}">See all concerts {{ icon('arrow') }}</a>
+    </div>
+    <div class="grid grid-3">
+      {% for c in featured[:3] %}{{ concert_card(c, favs) }}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if this_week %}
+<section class="section-sm">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="kicker">Happening soon</span><h2>This week</h2></div>
+      <a class="btn btn-outline btn-sm" href="{{ url_for('public.concerts', when='week') }}">Next 7 days {{ icon('arrow') }}</a>
+    </div>
+    <div class="grid grid-4">
+      {% for c in this_week %}{{ concert_card(c, favs) }}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="container">
+    <div class="section-head"><div><span class="kicker">Why ConcertTix</span><h2>Booking without the surprises</h2></div></div>
+    <div class="features">
+      <div class="feature"><div class="ico">{{ icon('eye') }}</div><h3>Interactive seat map</h3><p>See the stage, choose your exact seat and watch availability update live.</p></div>
+      <div class="feature"><div class="ico">{{ icon('receipt') }}</div><h3>Fees shown up front</h3><p>One 5% service fee, shown on the seat map before checkout. No last-step surprises.</p></div>
+      <div class="feature"><div class="ico">{{ icon('qr') }}</div><h3>Instant QR e-tickets</h3><p>Every seat gets its own QR code in My Tickets. Nothing to collect, nothing to lose.</p></div>
+      <div class="feature"><div class="ico">{{ icon('shield') }}</div><h3>Buyer Guarantee</h3><p>Covered for invalid tickets, non-delivery and cancelled events.</p></div>
+      <div class="feature"><div class="ico">{{ icon('globe') }}</div><h3>Multi-currency</h3><p>Browse prices in SGD, USD, EUR, GBP, MYR, THB or MMK.</p></div>
+      <div class="feature"><div class="ico">{{ icon('sparkle') }}</div><h3>AI assistant</h3><p>Ask Tixie what's on this weekend or how refunds work, any time.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="kicker">On sale</span><h2>Upcoming concerts</h2></div>
+    </div>
+    <div class="grid grid-4">
+      {% for c in soon %}{{ concert_card(c, favs) }}{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head"><div><span class="kicker">Line-up</span><h2>Artists on tour</h2></div></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">
+      {% for a in artists %}
+      <a class="artist-tile" href="{{ url_for('public.artist', artist_id=a.id) }}">
+        <img src="{{ a.image|image }}" alt="{{ a.name }}" loading="lazy">
+        <b>{{ a.name }}</b><span class="muted small">{{ a.genre }}{% if a.shows %} · {{ a.shows }} show{{ 's' if a.shows > 1 }}{% endif %}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="band">
+      <div>
+        <h2>Never miss a drop.</h2>
+        <p>Create a free account to save favourites, keep every e-ticket in one place and check out in seconds.</p>
+      </div>
+      <div class="row" style="justify-content:flex-end">
+        {% if current_user %}
+          <a class="btn btn-primary btn-lg" href="{{ url_for('account.tickets') }}">Go to my tickets</a>
+        {% else %}
+          <a class="btn btn-primary btn-lg" href="{{ url_for('auth.signup') }}">Create free account</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

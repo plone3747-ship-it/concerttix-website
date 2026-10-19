@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon, stars with context %}
+{% block admin_title %}{{ u.name }}{% endblock %}
+{% block page_title %}Customer{% endblock %}
+{% block admin_content %}
+<a class="link small" href="{{ url_for('admin.customers') }}">← All customers</a>
+<div class="form-grid" style="margin-top:14px">
+  <div class="stack">
+    <section class="card card-pad">
+      <h3>Orders ({{ orders|length }})</h3>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Order</th><th>Concert</th><th>Tickets</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for o in orders %}
+            <tr><td><a class="link" href="{{ url_for('admin.order_detail', oid=o.id) }}">{{ o.order_ref }}</a><div class="muted small">{{ o.order_date.strftime('%d %b %Y') }}</div></td>
+              <td>{{ o.title }}<div class="muted small">{{ o.date|date('%d %b %Y') }}</div></td><td class="num">{{ o.tickets }}</td>
+              <td class="num">{{ o.total|money }}</td><td><span class="badge badge-{{ o.payment_status }}">{{ o.payment_status|label }}</span></td></tr>
+          {% else %}<tr><td colspan="5" class="muted">No orders yet.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    {% if reviews %}
+    <section class="card card-pad">
+      <h3>Reviews</h3>
+      {% for r in reviews %}<div class="review"><b>{{ r.title }}</b> {{ stars(r.rating) }}<p class="small" style="margin:4px 0 0">{{ r.comment }}</p></div>{% endfor %}
+    </section>
+    {% endif %}
+  </div>
+  <div class="stack">
+    <section class="card card-pad">
+      <div class="row"><span class="avatar" style="width:52px;height:52px;font-size:1.2rem">{{ u.name[:1] }}</span><div><h3 style="margin:0">{{ u.name }}</h3><span class="badge {{ 'badge-cream' if u.role == 'admin' }}">{{ u.role|title }}</span></div></div>
+      <div class="divider" style="margin:16px 0"></div>
+      <div class="summary-row"><span class="k">Email</span><b>{{ u.email }}</b></div>
+      <div class="summary-row"><span class="k">Phone</span><b>{{ u.phone or '—' }}</b></div>
+      <div class="summary-row"><span class="k">Joined</span><b>{{ u.created_at.strftime('%d %b %Y') }}</b></div>
+      <div class="summary-row"><span class="k">Total spent</span><b>{{ (orders|selectattr('payment_status', 'equalto', 'paid')|sum(attribute='total'))|money }}</b></div>
+      {% if u.id != current_user.id %}
+      <form method="post" action="{{ url_for('admin.customer_role', uid=u.id) }}" style="margin-top:14px" data-confirm="Change this user's role?">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="role" value="{{ 'customer' if u.role == 'admin' else 'admin' }}">
+        <button class="btn btn-outline btn-sm" type="submit">{{ 'Remove admin access' if u.role == 'admin' else 'Make admin' }}</button>
+      </form>
+      {% endif %}
+    </section>
+    {% if favs %}<section class="card card-pad"><h3>Favourites</h3><div class="pills">{% for f in favs %}<span class="pill">{{ f.title }}</span>{% endfor %}</div></section>{% endif %}
+  </div>
+</div>
+{% endblock %}

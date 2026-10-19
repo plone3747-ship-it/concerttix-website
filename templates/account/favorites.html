@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import icon, concert_card with context %}
+{% block title %}Favourites{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="page-head"><span class="kicker">Account</span><h1>Favourites</h1><p>Concerts you've saved with the heart icon.</p></header>
+  {% if concerts %}
+    <div class="grid grid-3" style="padding-bottom:40px">{% for c in concerts %}{{ concert_card(c, favs) }}{% endfor %}</div>
+  {% else %}
+    <div class="card empty">{{ icon('heart') }}<h3>Nothing saved yet</h3><p>Tap the heart on any concert to keep it here.</p><a class="btn btn-primary" href="{{ url_for('public.concerts') }}">Browse concerts</a></div>
+  {% endif %}
+</div>
+{% endblock %}

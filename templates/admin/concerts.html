@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% from "partials/macros.html" import icon, pagination with context %}
+{% block admin_title %}Concerts{% endblock %}
+{% block page_title %}Concerts{% endblock %}
+{% block top_actions %}<a class="btn btn-primary btn-sm" href="{{ url_for('admin.concert_new') }}">{{ icon('plus') }} Add concert</a>{% endblock %}
+{% block admin_content %}
+<form class="filter-bar" method="get">
+  <input class="input" type="search" name="q" value="{{ q }}" placeholder="Search title, artist or venue" aria-label="Search">
+  <select class="input" name="status" aria-label="Status" onchange="this.form.submit()">
+    <option value="">All statuses</option>
+    {% for s in ['on_sale','sold_out','cancelled','completed','draft'] %}<option value="{{ s }}" {{ 'selected' if s == status }}>{{ s|label }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-outline btn-sm" type="submit">Filter</button>
+  <span class="muted small" style="margin-left:auto">{{ total }} concerts</span>
+</form>
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th></th><th>Concert</th><th>Date</th><th>Venue</th><th>Sold</th><th>Revenue</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for c in rows %}
+      {% set pct = (c.sold / (c.cap or 1) * 100)|round|int %}
+      <tr>
+        <td><img class="thumb" src="{{ c.image|image }}" alt=""></td>
+        <td class="wrap"><b>{{ c.title }}</b>{% if c.featured %} <span class="badge badge-cream">Featured</span>{% endif %}<div class="muted small">{{ c.artist }} · {{ c.genre }} · {{ c.age_limit }}</div></td>
+        <td>{{ c.date|date('%d %b %Y') }}<div class="muted small">{{ c.time|time }}</div></td>
+        <td>{{ c.venue }}<div class="muted small">{{ c.city }}</div></td>
+        <td style="min-width:120px"><span class="num">{{ c.sold }}/{{ c.cap }}</span><div class="bar" style="margin-top:4px"><span style="width:{{ pct }}%"></span></div></td>
+        <td class="num">{{ c.revenue|money }}</td>
+        <td><span class="badge badge-{{ c.status }}">{{ c.status|label }}</span></td>
+        <td><div class="actions">
+          <a class="icon-btn" href="{{ url_for('public.concert_detail', concert_id=c.id) }}" title="View on site" target="_blank">{{ icon('eye') }}</a>
+          <a class="icon-btn" href="{{ url_for('admin.inventory', cid=c.id) }}" title="Ticket inventory">{{ icon('layers') }}</a>
+          <a class="icon-btn" href="{{ url_for('admin.concert_edit', cid=c.id) }}" title="Edit">{{ icon('edit') }}</a>
+          <form method="post" action="{{ url_for('admin.concert_delete', cid=c.id) }}" data-confirm="Delete “{{ c.title }}”? This removes its seat inventory too.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="icon-btn" title="Delete" type="submit">{{ icon('trash') }}</button></form>
+        </div></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="8" class="muted" style="text-align:center;padding:40px">No concerts found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pagination(page, pages, 'admin.concerts', {'q': q, 'status': status}) }}
+{% endblock %}
